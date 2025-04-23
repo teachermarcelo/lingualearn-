@@ -126,7 +126,42 @@
             alert(`Account created for ${name} (${email})`);
             switchToLogin(); // Switch back to login form after signup
         }
+</script>
+<!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js"></script>
+ <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAkjkOs1gsxP87Lyh_9GssmJLj3wKTrZx8",
+  authDomain: "webapp-5e12e.firebaseapp.com",
+  projectId: "webapp-5e12e",
+  storageBucket: "webapp-5e12e.firebasestorage.app",
+  messagingSenderId: "49767087033",
+  appId: "1:49767087033:web:6d10077007fcc178451468",
+  measurementId: "G-HLGS0QVWH1"
+};
+firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
 
+  function signUp() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const message = document.getElementById("message");
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        message.textContent = "✅ Cadastro realizado com sucesso! Redirecionando...";
+        message.className = "message";
+        // Aguarda 2 segundos e redireciona
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 2000);
+      })
+      .catch((error) => {
+        message.textContent = "❌ " + error.message;
+        message.className = "message error";
+      });
+  }
         // Logout
         function logout() {
             document.getElementById('dashboardPage').classList.add('hidden');
