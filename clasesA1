@@ -1,1 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English A1 Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .lesson-card {
+            transition: all 0.3s ease;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        .lesson-card.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .skill-tag {
+            transition: all 0.2s ease;
+        }
+        .skill-tag:hover {
+            transform: scale(1.05);
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        #voiceRecorder {
+            transition: all 0.3s ease;
+        }
+        #voiceRecorder.recording {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+        }
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="bg-indigo-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-language text-3xl"></i>
+                    <h1 class="text-2xl font-bold">English A1 Explorer</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-white"></div>
+                    </div>
+                    <span class="font-medium">Student</span>
+                </div>
+            </div>
+        </div>
+    </header>
 
+    <main class="container mx-auto px-4 py-8">
+        <section class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Start Your English Journey</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+                Learn English step by step with interactive lessons, games, and speaking practice.
+            </p>
+            <button id="exploreBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg">
+                Explore Lessons <i class="fas fa-chevron-right ml-2"></i>
+            </button>
+        </section>
+
+        <section id="lessonsSection" class="hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-bold text-gray-800">All Lessons (A1 Level)</h3>
+                <div class="flex space-x-2">
+                    <div class="relative">
+                        <select class="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option>Filter by Skill</option>
+                            <option>Reading</option>
+                            <option>Writing</option>
+                            <option>Speaking</option>
+                            <option>Listening</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <select class="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option>Sort by</option>
+                            <option>Difficulty</option>
+                            <option>Popularity</option>
+                            <option>Newest</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="lessonsContainer">
+                <!-- Lesson cards will be inserted here by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Voice Recorder Modal -->
+    <div id="voiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Speaking Practice</h3>
+                <button id="closeVoiceModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <p class="text-gray-700 mb-2">Repeat after the audio:</p>
+                <p class="text-lg font-medium text-indigo-600" id="phraseToRepeat">Hello, my name is John.</p>
+            </div>
+            <div class="flex justify-center mb-6">
+                <button id="playSample" class="bg-gray-200 hover:bg-gray-300 rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                    <i class="fas fa-play text-indigo-600"></i>
+                </button>
+                <div id="voiceRecorder" class="bg-red-100 rounded-full w-16 h-16 flex items-center justify-center cursor-pointer">
+                    <i class="fas fa-microphone text-red-600 text-2xl"></i>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 mr-3 relative">
+                        <svg class="w-full h-full" viewBox="0 0 36 36">
+                            <path
+                                d="M18 2.0845
+                                a 15.9155 15.9155 0 0 1 0 31.831
+                                a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none"
+                                stroke="#E5E7EB"
+                                stroke-width="3"
+                                stroke-dasharray="100, 100"
+                            />
+                            <path
+                                class="progress-ring__circle"
+                                d="M18 2.0845
+                                a 15.9155 15.9155 0 0 1 0 31.831
+                                a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none"
+                                stroke="#10B981"
+                                stroke-width="3"
+                                stroke-dasharray="0, 100"
+                            />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700">0%</div>
+                    </div>
+                    <span class="text-sm text-gray-600">Pronunciation score</span>
+                </div>
+                <button id="submitRecording" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg disabled:opacity-50" disabled>
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Detail Modal -->
+    <div id="lessonModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden overflow-y-auto">
+        <div class="bg-white rounded-xl p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-gray-800" id="lessonModalTitle">Lesson Title</h3>
+                <button id="closeLessonModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-6" id="lessonSkills">
+                <!-- Skill tags will be inserted here -->
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-2">
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-info-circle text-indigo-500 mr-2"></i> About This Lesson
+                        </h4>
+                        <p class="text-gray-700" id="lessonDescription">
+                            Lesson description will appear here.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-tasks text-indigo-500 mr-2"></i> Activities
+                        </h4>
+                        <div class="space-y-4" id="lessonActivities">
+                            <!-- Activities will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="bg-indigo-50 rounded-lg p-6 mb-6">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-chart-line text-indigo-500 mr-2"></i> Progress
+                        </h4>
+                        <div class="flex items-center justify-center mb-4">
+                            <div class="relative w-32 h-32">
+                                <svg class="w-full h-full" viewBox="0 0 36 36">
+                                    <path
+                                        d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="#E5E7EB"
+                                        stroke-width="3"
+                                        stroke-dasharray="100, 100"
+                                    />
+                                    <path
+                                        class="progress-ring__circle"
+                                        d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="#4F46E5"
+                                        stroke-width="3"
+                                        stroke-dasharray="0, 100"
+                                    />
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center text-2xl font-bold text-indigo-700">0%</div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg">
+                                Start Lesson
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                            <i class="fas fa-trophy text-yellow-500 mr-2"></i> Achievements
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-lock text-gray-500"></i>
+                                </div>
+                                <span class="text-gray-600">Complete 1 activity</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-lock text-gray-500"></i>
+                                </div>
+                                <span class="text-gray-600">Score 80% or higher</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-lock text-gray-500"></i>
+                                </div>
+                                <span class="text-gray-600">Record perfect pronunciation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                    <i class="fas fa-comment-alt text-indigo-500 mr-2"></i> Community Notes
+                </h4>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-indigo-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-medium text-gray-800">Maria S.</span>
+                                    <span class="text-sm text-gray-500">2 days ago</span>
+                                </div>
+                                <p class="text-gray-700">This lesson helped me a lot with my pronunciation. The voice recording feature is amazing!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-indigo-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-medium text-gray-800">John D.</span>
+                                    <span class="text-sm text-gray-500">1 week ago</span>
+                                </div>
+                                <p class="text-gray-700">The matching game made memorizing vocabulary much easier. Great lesson!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <textarea class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3" placeholder="Add your note about this lesson..."></textarea>
+                        <div class="flex justify-end mt-2">
+                            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+                                Post Note
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lessons data
+        const lessons = [
+            {
+                id: 1,
+                title: "Greetings and Farewells",
+                description: "Learn how to greet people and say goodbye in English in different situations. Master common phrases like 'Hello', 'Good morning', 'How are you?', and 'Goodbye'.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "matching",
+                        title: "Match the Greetings",
+                        description: "Drag the English phrases to match with their meanings in your language."
+                    },
+                    {
+                        type: "recording",
+                        title: "Practice Pronunciation",
+                        description: "Record yourself saying common greetings and get feedback on your pronunciation."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Greetings Quiz",
+                        description: "Test your knowledge with multiple-choice questions about appropriate greetings."
+                    }
+                ],
+                icon: "handshake"
+            },
+            {
+                id: 2,
+                title: "Introducing Yourself",
+                description: "Learn how to introduce yourself, share basic personal information, and ask others about themselves. Practice saying your name, age, nationality, and occupation.",
+                skills: ["Speaking", "Writing"],
+                activities: [
+                    {
+                        type: "fill-blank",
+                        title: "Complete the Introduction",
+                        description: "Fill in the blanks to complete a proper self-introduction."
+                    },
+                    {
+                        type: "recording",
+                        title: "Record Your Introduction",
+                        description: "Record a video introducing yourself and compare with sample responses."
+                    },
+                    {
+                        type: "game",
+                        title: "Introduction Chain Game",
+                        description: "Practice introducing yourself and remembering others' introductions in this interactive game."
+                    }
+                ],
+                icon: "user"
+            },
+            {
+                id: 3,
+                title: "The Alphabet and Spelling Words",
+                description: "Master the English alphabet and practice spelling common words. Learn pronunciation of each letter and common spelling patterns.",
+                skills: ["Listening", "Writing"],
+                activities: [
+                    {
+                        type: "audio",
+                        title: "Letter Pronunciation",
+                        description: "Listen to and repeat each letter of the alphabet."
+                    },
+                    {
+                        type: "game",
+                        title: "Spelling Bee",
+                        description: "Practice spelling common words in a fun game format."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Alphabet Order Quiz",
+                        description: "Test your knowledge of letter order in the English alphabet."
+                    }
+                ],
+                icon: "spell-check"
+            },
+            {
+                id: 4,
+                title: "Numbers (0–100+) and Saying Your Age",
+                description: "Learn to count from 0 to 100 and beyond, and practice saying your age and asking others about their age. Master both cardinal and ordinal numbers.",
+                skills: ["Listening", "Speaking"],
+                activities: [
+                    {
+                        type: "audio",
+                        title: "Number Pronunciation",
+                        description: "Listen to and repeat numbers from 0 to 100."
+                    },
+                    {
+                        type: "game",
+                        title: "Number Matching Game",
+                        description: "Match written numbers with their spoken versions."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Age Questions Quiz",
+                        description: "Practice asking and answering questions about age."
+                    }
+                ],
+                icon: "sort-numeric-up"
+            },
+            {
+                id: 5,
+                title: "Days of the Week and Months of the Year",
+                description: "Learn the names of days and months, and how to talk about dates and schedules. Practice pronunciation and common expressions related to time.",
+                skills: ["Reading", "Speaking"],
+                activities: [
+                    {
+                        type: "matching",
+                        title: "Day/Month Matching",
+                        description: "Match days and months with their correct order."
+                    },
+                    {
+                        type: "recording",
+                        title: "Date Pronunciation",
+                        description: "Practice saying dates and get feedback on your pronunciation."
+                    },
+                    {
+                        type: "game",
+                        title: "Calendar Game",
+                        description: "Practice scheduling activities on specific days and months."
+                    }
+                ],
+                icon: "calendar-alt"
+            },
+            {
+                id: 6,
+                title: "Colors and Shapes",
+                description: "Learn the names of common colors and shapes in English. Practice describing objects by their color and shape.",
+                skills: ["Listening", "Speaking"],
+                activities: [
+                    {
+                        type: "visual",
+                        title: "Color Identification",
+                        description: "Identify colors by name in an interactive color wheel."
+                    },
+                    {
+                        type: "game",
+                        title: "Shape Matching Game",
+                        description: "Match shapes with their correct names."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Color/Shape Description Quiz",
+                        description: "Test your ability to describe objects by color and shape."
+                    }
+                ],
+                icon: "palette"
+            },
+            {
+                id: 7,
+                title: "Family and Relationships",
+                description: "Learn vocabulary for family members and relationships. Practice describing your family and asking others about theirs.",
+                skills: ["Reading", "Writing"],
+                activities: [
+                    {
+                        type: "family-tree",
+                        title: "Family Tree Builder",
+                        description: "Build your family tree and label each relationship."
+                    },
+                    {
+                        type: "writing",
+                        title: "Describe Your Family",
+                        description: "Write a short paragraph describing your family members."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Relationship Terms Quiz",
+                        description: "Test your knowledge of family relationship terms."
+                    }
+                ],
+                icon: "users"
+            },
+            {
+                id: 8,
+                title: "Parts of the Body and Physical Description",
+                description: "Learn vocabulary for body parts and how to describe people's physical appearance. Practice describing yourself and others.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "labeling",
+                        title: "Body Part Labeling",
+                        description: "Label a diagram of the human body with correct terms."
+                    },
+                    {
+                        type: "recording",
+                        title: "Describe Someone",
+                        description: "Record yourself describing a person's appearance."
+                    },
+                    {
+                        type: "game",
+                        title: "Description Matching Game",
+                        description: "Match descriptions with the correct images of people."
+                    }
+                ],
+                icon: "user-md"
+            },
+            {
+                id: 9,
+                title: "Clothes and Accessories",
+                description: "Learn vocabulary for clothing items and accessories. Practice describing what people are wearing and shopping for clothes.",
+                skills: ["Listening", "Speaking"],
+                activities: [
+                    {
+                        type: "matching",
+                        title: "Clothing Matching",
+                        description: "Match clothing items with their names."
+                    },
+                    {
+                        type: "game",
+                        title: "Dress Up Game",
+                        description: "Dress a character by listening to clothing instructions."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Shopping Dialogues Quiz",
+                        description: "Practice common shopping dialogues for buying clothes."
+                    }
+                ],
+                icon: "tshirt"
+            },
+            {
+                id: 10,
+                title: "Food, Drinks, and Meals",
+                description: "Learn vocabulary for common foods, drinks, and meals. Practice ordering food in a restaurant and talking about food preferences.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "matching",
+                        title: "Food Category Matching",
+                        description: "Sort food items into correct categories."
+                    },
+                    {
+                        type: "recording",
+                        title: "Ordering Food",
+                        description: "Practice ordering food in a restaurant scenario."
+                    },
+                    {
+                        type: "game",
+                        title: "Menu Game",
+                        description: "Create a menu and take orders in this interactive game."
+                    }
+                ],
+                icon: "utensils"
+            },
+            {
+                id: 11,
+                title: "Telling the Time and Daily Routines",
+                description: "Learn how to tell time in English and describe your daily routine. Practice talking about schedules and habitual activities.",
+                skills: ["Reading", "Speaking"],
+                activities: [
+                    {
+                        type: "clock",
+                        title: "Interactive Clock",
+                        description: "Practice setting and reading times on a clock."
+                    },
+                    {
+                        type: "writing",
+                        title: "My Daily Routine",
+                        description: "Write about your typical daily schedule."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Time Expressions Quiz",
+                        description: "Test your knowledge of time-related expressions."
+                    }
+                ],
+                icon: "clock"
+            },
+            {
+                id: 12,
+                title: "The Verb 'To Be'",
+                description: "Learn how to use the verb 'to be' in affirmative, negative, and question forms. Master this fundamental verb for describing states and identities.",
+                skills: ["Writing", "Speaking"],
+                activities: [
+                    {
+                        type: "fill-blank",
+                        title: "Complete with 'To Be'",
+                        description: "Fill in sentences with the correct form of 'to be'."
+                    },
+                    {
+                        type: "game",
+                        title: "Sentence Builder",
+                        description: "Build correct sentences using 'to be' in different forms."
+                    },
+                    {
+                        type: "quiz",
+                        title: "'To Be' Quiz",
+                        description: "Test your knowledge of the verb 'to be'."
+                    }
+                ],
+                icon: "equals"
+            },
+            {
+                id: 13,
+                title: "The Verb 'Have/Has'",
+                description: "Learn how to use 'have' and 'has' to talk about possession, relationships, and characteristics. Practice affirmative, negative, and question forms.",
+                skills: ["Writing", "Speaking"],
+                activities: [
+                    {
+                        type: "transformation",
+                        title: "Positive to Negative",
+                        description: "Transform sentences from positive to negative forms."
+                    },
+                    {
+                        type: "game",
+                        title: "Have/Has Sorting Game",
+                        description: "Sort sentences into have/has categories."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Have/Has Quiz",
+                        description: "Test your knowledge of when to use have vs. has."
+                    }
+                ],
+                icon: "box-open"
+            },
+            {
+                id: 14,
+                title: "Definite and Indefinite Articles",
+                description: "Learn when to use 'a', 'an', and 'the' in English. Master the rules for definite and indefinite articles through practice.",
+                skills: ["Reading", "Writing"],
+                activities: [
+                    {
+                        type: "fill-blank",
+                        title: "Article Fill-in",
+                        description: "Fill in blanks with the correct article (a, an, the)."
+                    },
+                    {
+                        type: "game",
+                        title: "Article Race",
+                        description: "Race against the clock to choose correct articles."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Article Rules Quiz",
+                        description: "Test your knowledge of article usage rules."
+                    }
+                ],
+                icon: "file-alt"
+            },
+            {
+                id: 15,
+                title: "Personal and Possessive Pronouns",
+                description: "Learn subject pronouns (I, you, he, etc.) and possessive pronouns (my, your, his, etc.). Practice using them correctly in sentences.",
+                skills: ["Writing", "Speaking"],
+                activities: [
+                    {
+                        type: "matching",
+                        title: "Pronoun Matching",
+                        description: "Match subject pronouns with their possessive forms."
+                    },
+                    {
+                        type: "transformation",
+                        title: "Noun to Pronoun",
+                        description: "Rewrite sentences replacing nouns with pronouns."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Pronoun Quiz",
+                        description: "Test your knowledge of pronoun usage."
+                    }
+                ],
+                icon: "user-tag"
+            },
+            {
+                id: 16,
+                title: "Basic Adjectives",
+                description: "Learn common adjectives to describe people, objects, and situations. Practice using adjectives in positive and negative forms.",
+                skills: ["Speaking", "Writing"],
+                activities: [
+                    {
+                        type: "matching",
+                        title: "Opposite Adjectives",
+                        description: "Match adjectives with their opposites."
+                    },
+                    {
+                        type: "writing",
+                        title: "Describe a Picture",
+                        description: "Write sentences describing a picture using adjectives."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Adjective Order Quiz",
+                        description: "Test your knowledge of adjective order in sentences."
+                    }
+                ],
+                icon: "font"
+            },
+            {
+                id: 17,
+                title: "This / That / These / Those",
+                description: "Learn how to use demonstratives (this, that, these, those) correctly. Practice distinguishing between singular/plural and near/far references.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "visual",
+                        title: "Demonstrative Practice",
+                        description: "Identify objects using correct demonstratives."
+                    },
+                    {
+                        type: "game",
+                        title: "This or That Game",
+                        description: "Quickly choose between this/that/these/those."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Demonstrative Quiz",
+                        description: "Test your knowledge of demonstrative usage."
+                    }
+                ],
+                icon: "hand-pointer"
+            },
+            {
+                id: 18,
+                title: "There is / There are",
+                description: "Learn how to describe existence and quantity using 'there is' and 'there are'. Practice affirmative, negative, and question forms.",
+                skills: ["Writing", "Speaking"],
+                activities: [
+                    {
+                        type: "fill-blank",
+                        title: "Complete the Sentences",
+                        description: "Fill in blanks with 'there is' or 'there are'."
+                    },
+                    {
+                        type: "game",
+                        title: "Room Description Game",
+                        description: "Describe what's in a room using correct forms."
+                    },
+                    {
+                        type: "quiz",
+                        title: "There is/are Quiz",
+                        description: "Test your knowledge of this structure."
+                    }
+                ],
+                icon: "map-marker-alt"
+            },
+            {
+                id: 19,
+                title: "Prepositions of Place",
+                description: "Learn prepositions for describing location (in, on, under, etc.). Practice describing where things are in relation to each other.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "visual",
+                        title: "Preposition Practice",
+                        description: "Describe object locations using prepositions."
+                    },
+                    {
+                        type: "game",
+                        title: "Preposition Memory Game",
+                        description: "Match pictures with correct prepositional phrases."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Preposition Quiz",
+                        description: "Test your knowledge of place prepositions."
+                    }
+                ],
+                icon: "location-arrow"
+            },
+            {
+                id: 20,
+                title: "Simple Present Tense",
+                description: "Learn how to form positive and negative sentences in the simple present tense. Practice talking about habits, routines, and general truths.",
+                skills: ["Writing", "Speaking"],
+                activities: [
+                    {
+                        type: "transformation",
+                        title: "Positive to Negative",
+                        description: "Transform positive sentences to negative."
+                    },
+                    {
+                        type: "game",
+                        title: "Verb Conjugation Race",
+                        description: "Quickly conjugate verbs in simple present."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Simple Present Quiz",
+                        description: "Test your knowledge of simple present usage."
+                    }
+                ],
+                icon: "hourglass-start"
+            },
+            {
+                id: 21,
+                title: "Yes/No Questions and Short Answers",
+                description: "Learn how to form yes/no questions and give appropriate short answers. Practice common question patterns in English.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "transformation",
+                        title: "Statement to Question",
+                        description: "Transform statements into yes/no questions."
+                    },
+                    {
+                        type: "game",
+                        title: "Question Ball Game",
+                        description: "Practice quick yes/no questions and answers."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Short Answer Quiz",
+                        description: "Test your ability to give proper short answers."
+                    }
+                ],
+                icon: "question-circle"
+            },
+            {
+                id: 22,
+                title: "Making Simple Requests and Offers",
+                description: "Learn polite ways to make requests ('Can I...?') and offers ('Would you like...?'). Practice common social interactions.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "dialogues",
+                        title: "Complete the Dialogues",
+                        description: "Fill in blanks in request/offer conversations."
+                    },
+                    {
+                        type: "recording",
+                        title: "Role Play Practice",
+                        description: "Record yourself in request/offer scenarios."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Politeness Quiz",
+                        description: "Test your knowledge of polite request forms."
+                    }
+                ],
+                icon: "hands-helping"
+            },
+            {
+                id: 23,
+                title: "Likes and Dislikes",
+                description: "Learn how to express preferences using 'like', 'love', 'don't like', and 'hate'. Practice talking about your favorite things.",
+                skills: ["Speaking", "Writing"],
+                activities: [
+                    {
+                        type: "survey",
+                        title: "Class Preferences Survey",
+                        description: "Ask and answer about likes/dislikes in a survey."
+                    },
+                    {
+                        type: "writing",
+                        title: "My Favorite Things",
+                        description: "Write about things you like and dislike."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Like/Dislike Quiz",
+                        description: "Test your knowledge of preference expressions."
+                    }
+                ],
+                icon: "heart"
+            },
+            {
+                id: 24,
+                title: "Talking about Hobbies and Free Time",
+                description: "Learn vocabulary for common hobbies and free time activities. Practice talking about what you do in your spare time.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "matching",
+                        title: "Hobby Matching",
+                        description: "Match hobby pictures with their names."
+                    },
+                    {
+                        type: "recording",
+                        title: "My Hobbies",
+                        description: "Record yourself talking about your hobbies."
+                    },
+                    {
+                        type: "game",
+                        title: "Hobby Charades",
+                        description: "Act out hobbies for others to guess."
+                    }
+                ],
+                icon: "gamepad"
+            },
+            {
+                id: 25,
+                title: "Weather and Seasons",
+                description: "Learn vocabulary for describing weather and seasons. Practice talking about current weather and seasonal activities.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "matching",
+                        title: "Weather Symbol Matching",
+                        description: "Match weather symbols with their descriptions."
+                    },
+                    {
+                        type: "recording",
+                        title: "Weather Report",
+                        description: "Record yourself giving a weather forecast."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Seasonal Activities Quiz",
+                        description: "Test knowledge of activities for each season."
+                    }
+                ],
+                icon: "cloud-sun"
+            },
+            {
+                id: 26,
+                title: "Places in Town and Giving Directions",
+                description: "Learn vocabulary for common places in a town/city and how to give simple directions. Practice asking for and giving directions.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "map",
+                        title: "Town Map Activity",
+                        description: "Label places on a map and practice directions."
+                    },
+                    {
+                        type: "game",
+                        title: "Direction Game",
+                        description: "Give directions to reach destinations on a map."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Places Vocabulary Quiz",
+                        description: "Test your knowledge of places in town."
+                    }
+                ],
+                icon: "map-marked-alt"
+            },
+            {
+                id: 27,
+                title: "Describing Your House or Apartment",
+                description: "Learn vocabulary for rooms and furniture. Practice describing where you live and the layout of your home.",
+                skills: ["Speaking", "Writing"],
+                activities: [
+                    {
+                        type: "floor-plan",
+                        title: "Create Your Floor Plan",
+                        description: "Draw and label a floor plan of your home."
+                    },
+                    {
+                        type: "writing",
+                        title: "My Home Description",
+                        description: "Write a description of your house or apartment."
+                    },
+                    {
+                        type: "quiz",
+                        title: "House Vocabulary Quiz",
+                        description: "Test your knowledge of home-related terms."
+                    }
+                ],
+                icon: "home"
+            },
+            {
+                id: 28,
+                title: "Classroom Objects and Commands",
+                description: "Learn vocabulary for common classroom objects and commands. Practice understanding and giving classroom instructions.",
+                skills: ["Listening", "Speaking"],
+                activities: [
+                    {
+                        type: "labeling",
+                        title: "Classroom Labeling",
+                        description: "Label objects in a classroom picture."
+                    },
+                    {
+                        type: "game",
+                        title: "Simon Says",
+                        description: "Follow classroom commands in this classic game."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Classroom Language Quiz",
+                        description: "Test your knowledge of classroom expressions."
+                    }
+                ],
+                icon: "chalkboard-teacher"
+            },
+            {
+                id: 29,
+                title: "Basic Shopping Vocabulary and Asking Prices",
+                description: "Learn vocabulary for shopping and how to ask about prices. Practice shopping dialogues and money-related expressions.",
+                skills: ["Speaking", "Listening"],
+                activities: [
+                    {
+                        type: "dialogues",
+                        title: "Shopping Role Play",
+                        description: "Practice shopping conversations with a partner."
+                    },
+                    {
+                        type: "game",
+                        title: "Price Guessing Game",
+                        description: "Guess prices of items and ask correctly."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Shopping Vocabulary Quiz",
+                        description: "Test your knowledge of shopping terms."
+                    }
+                ],
+                icon: "shopping-cart"
+            },
+            {
+                id: 30,
+                title: "Jobs and Occupations",
+                description: "Learn vocabulary for common jobs and occupations. Practice talking about what people do and asking about professions.",
+                skills: ["Speaking", "Writing"],
+                activities: [
+                    {
+                        type: "matching",
+                        title: "Job Description Matching",
+                        description: "Match jobs with their typical activities."
+                    },
+                    {
+                        type: "interview",
+                        title: "Job Interview Practice",
+                        description: "Practice answering questions about jobs."
+                    },
+                    {
+                        type: "quiz",
+                        title: "Occupations Quiz",
+                        description: "Test your knowledge of job titles and duties."
+                    }
+                ],
+                icon: "briefcase"
+            }
+        ];
+
+        // DOM elements
+        const exploreBtn = document.getElementById('exploreBtn');
+        const lessonsSection = document.getElementById('lessonsSection');
+        const lessonsContainer = document.getElementById('lessonsContainer');
+        const lessonModal = document.getElementById('lessonModal');
+        const closeLessonModal = document.getElementById('closeLessonModal');
+        const lessonModalTitle = document.getElementById('lessonModalTitle');
+        const lessonDescription = document.getElementById('lessonDescription');
+        const lessonSkills = document.getElementById('lessonSkills');
+        const lessonActivities = document.getElementById('lessonActivities');
+        const voiceModal = document.getElementById('voiceModal');
+        const closeVoiceModal = document.getElementById('closeVoiceModal');
+        const voiceRecorder = document.getElementById('voiceRecorder');
+        const playSample = document.getElementById('playSample');
+        const submitRecording = document.getElementById('submitRecording');
+        const phraseToRepeat = document.getElementById('phraseToRepeat');
+
+        // Show lessons when Explore button is clicked
+        exploreBtn.addEventListener('click', function() {
+            lessonsSection.classList.remove('hidden');
+            exploreBtn.classList.add('hidden');
+            
+            // Render lesson cards
+            renderLessonCards();
+            
+            // Animate lesson cards
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.lesson-card');
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('show');
+                    }, index * 100);
+                });
+            }, 100);
+        });
+
+        // Render lesson cards
+        function renderLessonCards() {
+            lessonsContainer.innerHTML = '';
+            
+            lessons.forEach(lesson => {
+                const card = document.createElement('div');
+                card.className = 'lesson-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer';
+                card.innerHTML = `
+                    <div class="flip-card h-full" onclick="openLessonModal(${lesson.id})">
+                        <div class="flip-card-inner h-full">
+                            <div class="flip-card-front h-full">
+                                <div class="p-6">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mr-4">
+                                            <i class="fas fa-${lesson.icon} text-indigo-600 text-xl"></i>
+                                        </div>
+                                        <h4 class="text-xl font-bold text-gray-800">${lesson.title}</h4>
+                                    </div>
+                                    <p class="text-gray-600 mb-4 line-clamp-2">${lesson.description}</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        ${lesson.skills.map(skill => `
+                                            <span class="skill-tag px-3 py-1 bg-${getSkillColor(skill)}-100 text-${getSkillColor(skill)}-800 text-sm rounded-full">
+                                                ${skill}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <div class="px-6 pb-4 pt-2 border-t border-gray-100 flex justify-between items-center">
+                                    <span class="text-sm text-gray-500">A1 Level</span>
+                                    <div class="flex items-center">
+                                        <div class="w-4 h-4 mr-1">
+                                            <svg class="w-full h-full" viewBox="0 0 36 36">
+                                                <path
+                                                    d="M18 2.0845
+                                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                    fill="none"
+                                                    stroke="#E5E7EB"
+                                                    stroke-width="3"
+                                                    stroke-dasharray="100, 100"
+                                                />
+                                                <path
+                                                    class="progress-ring__circle"
+                                                    d="M18 2.0845
+                                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                    fill="none"
+                                                    stroke="#4F46E5"
+                                                    stroke-width="3"
+                                                    stroke-dasharray="30, 100"
+                                                />
+                                            </svg>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-700">30%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flip-card-back h-full bg-indigo-600 text-white p-6">
+                                <h4 class="text-xl font-bold mb-3">${lesson.title}</h4>
+                                <div class="mb-4">
+                                    <p class="text-sm font-medium mb-1">Skills you'll practice:</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        ${lesson.skills.map(skill => `
+                                            <span class="px-2 py-1 bg-indigo-500 text-white text-xs rounded">
+                                                ${skill}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <p class="text-sm font-medium mb-1">Activities include:</p>
+                                    <ul class="list-disc list-inside text-sm space-y-1">
+                                        ${lesson.activities.slice(0, 3).map(activity => `
+                                            <li>${activity.title}</li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                                <div class="text-center mt-4">
+                                    <span class="text-xs bg-white text-indigo-600 px-3 py-1 rounded-full font-medium">Click to view details</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                lessonsContainer.appendChild(card);
+            });
+        }
+
+        // Get color for skill tag
+        function getSkillColor(skill) {
+            const colors = {
+                'Reading': 'blue',
+                'Writing': 'green',
+                'Speaking': 'red',
+                'Listening': 'purple'
+            };
+            return colors[skill] || 'indigo';
+        }
+
+        // Open lesson modal
+        window.openLessonModal = function(lessonId) {
+            const lesson = lessons.find(l => l.id === lessonId);
+            if (!lesson) return;
+            
+            // Set lesson details
+            lessonModalTitle.textContent = lesson.title;
+            lessonDescription.textContent = lesson.description;
+            
+            // Set skills
+            lessonSkills.innerHTML = lesson.skills.map(skill => `
+                <span class="skill-tag px-3 py-1 bg-${getSkillColor(skill)}-100 text-${getSkillColor(skill)}-800 text-sm rounded-full">
+                    ${skill}
+                </span>
+            `).join('');
+            
+            // Set activities
+            lessonActivities.innerHTML = lesson.activities.map(activity => `
+                <div class="bg-white p-4 rounded-lg border border-gray-200">
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                            <i class="fas fa-${getActivityIcon(activity.type)} text-indigo-600"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-medium text-gray-800">${activity.title}</h5>
+                            <p class="text-sm text-gray-600">${activity.description}</p>
+                            ${activity.type === 'recording' ? `
+                                <button onclick="openVoiceModal('${lesson.activities[0].title}', 'Hello, my name is [Your Name]. I am learning English.')" 
+                                        class="mt-2 text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center">
+                                    Try it now <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Show modal
+            lessonModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        // Get icon for activity type
+        function getActivityIcon(type) {
+            const icons = {
+                'matching': 'random',
+                'recording': 'microphone',
+                'quiz': 'question-circle',
+                'game': 'gamepad',
+                'fill-blank': 'edit',
+                'writing': 'pen',
+                'audio': 'volume-up',
+                'visual': 'image',
+                'transformation': 'exchange-alt',
+                'dialogues': 'comments',
+                'survey': 'poll',
+                'labeling': 'tag',
+                'interview': 'user-tie',
+                'family-tree': 'sitemap',
+                'floor-plan': 'vector-square',
+                'map': 'map'
+            };
+            return icons[type] || 'tasks';
+        }
+
+        // Close lesson modal
+        closeLessonModal.addEventListener('click', function() {
+            lessonModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Open voice recording modal
+        window.openVoiceModal = function(activityTitle, phrase) {
+            phraseToRepeat.textContent = phrase;
+            voiceModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        // Close voice modal
+        closeVoiceModal.addEventListener('click', function() {
+            voiceModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Voice recorder interaction
+        let isRecording = false;
+        voiceRecorder.addEventListener('click', function() {
+            isRecording = !isRecording;
+            
+            if (isRecording) {
+                this.classList.add('recording');
+                this.innerHTML = '<i class="fas fa-stop text-red-600 text-2xl"></i>';
+                submitRecording.disabled = false;
+                
+                // Simulate progress
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5;
+                    const circle = document.querySelector('#voiceModal .progress-ring__circle');
+                    const text = document.querySelector('#voiceModal .progress-ring__circle + div');
+                    
+                    if (circle && text) {
+                        const circumference = 2 * Math.PI * 15.9155;
+                        const offset = circumference - (progress / 100) * circumference;
+                        circle.style.strokeDashoffset = offset;
+                        text.textContent = `${progress}%`;
+                    }
+                    
+                    if (progress >= 100 || !isRecording) {
+                        clearInterval(interval);
+                    }
+                }, 200);
+            } else {
+                this.classList.remove('recording');
+                this.innerHTML = '<i class="fas fa-microphone text-red-600 text-2xl"></i>';
+            }
+        });
+
+        // Play sample audio
+        playSample.addEventListener('click', function() {
+            // In a real app, this would play an audio file
+            this.innerHTML = '<i class="fas fa-pause text-indigo-600"></i>';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-play text-indigo-600"></i>';
+            }, 2000);
+        });
+
+        // Submit recording
+        submitRecording.addEventListener('click', function() {
+            // Simulate processing
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-check mr-2"></i> Submitted!';
+                
+                // Show success message
+                const circle = document.querySelector('#voiceModal .progress-ring__circle');
+                const text = document.querySelector('#voiceModal .progress-ring__circle + div');
+                if (circle && text) {
+                    circle.style.stroke = '#10B981'; // Green color
+                    text.textContent = '85%';
+                    text.className = 'absolute inset-0 flex items-center justify-center text-xs font-bold text-green-700';
+                }
+                
+                setTimeout(() => {
+                    voiceModal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                    this.innerHTML = 'Submit';
+                    
+                    // Reset for next time
+                    if (circle && text) {
+                        circle.style.stroke = '#E5E7EB';
+                        text.textContent = '0%';
+                        text.className = 'absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700';
+                    }
+                }, 1500);
+            }, 2000);
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === lessonModal) {
+                lessonModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+            if (event.target === voiceModal) {
+                voiceModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
+</body>
+</html>
