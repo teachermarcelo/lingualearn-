@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+</head>
+<body>
+  <h2>Entrar</h2>
+  <input id="signin-email" type="email" placeholder="Email" />
+  <input id="signin-password" type="password" placeholder="Senha" />
+  <button id="signin">Entrar</button>
+
+  <script type="module">
+    import { auth, signInWithEmailAndPassword } from './firebase.js';
+
+    document.getElementById('signin').addEventListener('click', () => {
+      const email = document.getElementById('signin-email').value;
+      const password = document.getElementById('signin-password').value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(userCredential => {
+          alert('Login realizado!');
+          window.location.href = 'index.html';
+        })
+        .catch(error => {
+          alert(error.message);
+        });
+    });
+  </script>
+</body>
+</html>
