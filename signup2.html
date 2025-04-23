@@ -153,10 +153,9 @@ firebase.initializeApp(firebaseConfig);
         message.textContent = "✅ Cadastro realizado com sucesso! Redirecionando...";
         message.className = "message";
         // Aguarda 2 segundos e redireciona
-        setTimeout(() => {
-          window.location.href = "classesA1.html";
-        }, 2000);
-      })
+        setTimeout(() =>auth.signInWithEmailAndPassword(email, password)
+  .then((userCredential) => {
+    window.location.href = "classesA1.html";
       .catch((error) => {
         message.textContent = "❌ " + error.message;
         message.className = "message error";
