@@ -27,12 +27,6 @@
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
         }
-        #voiceRecorder {
-            transition: all 0.3s ease;
-        }
-        #voiceRecorder.recording {
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
-        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -89,202 +83,81 @@
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="lessonsContainer">
-                <!-- Lesson buttons will be inserted here by JavaScript -->
+                <!-- Lesson buttons will be inserted here -->
             </div>
         </section>
     </main>
 
-    <!-- Voice Recorder Modal -->
-    <div id="voiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl p-6 w-full max-w-md">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-800">Speaking Practice</h3>
-                <button id="closeVoiceModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="mb-4">
-                <p class="text-gray-700 mb-2">Repeat after the audio:</p>
-                <p class="text-lg font-medium text-indigo-600" id="phraseToRepeat">Hello, my name is John.</p>
-            </div>
-            <div class="flex justify-center mb-6">
-                <button id="playSample" class="bg-gray-200 hover:bg-gray-300 rounded-full w-12 h-12 flex items-center justify-center mr-4">
-                    <i class="fas fa-play text-indigo-600"></i>
-                </button>
-                <div id="voiceRecorder" class="bg-red-100 rounded-full w-16 h-16 flex items-center justify-center cursor-pointer">
-                    <i class="fas fa-microphone text-red-600 text-2xl"></i>
-                </div>
-            </div>
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <div class="w-10 h-10 mr-3 relative">
-                        <svg class="w-full h-full" viewBox="0 0 36 36">
-                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E5E7EB" stroke-width="3" stroke-dasharray="100, 100"/>
-                            <path class="progress-ring__circle" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10B981" stroke-width="3" stroke-dasharray="0, 100"/>
-                        </svg>
-                        <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700">0%</div>
-                    </div>
-                    <span class="text-sm text-gray-600">Pronunciation score</span>
-                </div>
-                <button id="submitRecording" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg disabled:opacity-50" disabled>
-                    Submit
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lesson Detail Modal -->
-    <div id="lessonModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden overflow-y-auto">
-        <div class="bg-white rounded-xl p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl font-bold text-gray-800" id="lessonModalTitle">Lesson Title</h3>
-                <button id="closeLessonModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-6" id="lessonSkills">
-                <!-- Skill tags will be inserted here -->
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div class="lg:col-span-2">
-                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                            <i class="fas fa-info-circle text-indigo-500 mr-2"></i> About This Lesson
-                        </h4>
-                        <p class="text-gray-700" id="lessonDescription">
-                            Lesson description will appear here.
-                        </p>
-                    </div>
-                    <div class="bg-gray-50 rounded-lg p-6">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                            <i class="fas fa-tasks text-indigo-500 mr-2"></i> Activities
-                        </h4>
-                        <div class="space-y-4" id="lessonActivities">
-                            <!-- Activities will be inserted here -->
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <div class="bg-indigo-50 rounded-lg p-6 mb-6">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                            <i class="fas fa-chart-line text-indigo-500 mr-2"></i> Progress
-                        </h4>
-                        <div class="flex items-center justify-center mb-4">
-                            <div class="relative w-32 h-32">
-                                <svg class="w-full h-full" viewBox="0 0 36 36">
-                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E5E7EB" stroke-width="3" stroke-dasharray="100, 100"/>
-                                    <path class="progress-ring__circle" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#4F46E5" stroke-width="3" stroke-dasharray="0, 100"/>
-                                </svg>
-                                <div class="absolute inset-0 flex items-center justify-center text-2xl font-bold text-indigo-700">0%</div>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg">
-                                Start Lesson
-                            </button>
-                        </div>
-                    </div>
-                    <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                            <i class="fas fa-trophy text-yellow-500 mr-2"></i> Achievements
-                        </h4>
-                        <div class="space-y-3">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-lock text-gray-500"></i>
-                                </div>
-                                <span class="text-gray-600">Complete 1 activity</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-lock text-gray-500"></i>
-                                </div>
-                                <span class="text-gray-600">Score 80% or higher</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-lock text-gray-500"></i>
-                                </div>
-                                <span class="text-gray-600">Record perfect pronunciation</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-6">
-                <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                    <i class="fas fa-comment-alt text-indigo-500 mr-2"></i> Community Notes
-                </h4>
-                <div class="space-y-4">
-                    <div class="flex items-start">
-                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
-                            <i class="fas fa-user text-indigo-600"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="bg-white p-4 rounded-lg shadow-sm">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="font-medium text-gray-800">Maria S.</span>
-                                    <span class="text-sm text-gray-500">2 days ago</span>
-                                </div>
-                                <p class="text-gray-700">This lesson helped me a lot with my pronunciation. The voice recording feature is amazing!</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="pt-2">
-                        <textarea class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3" placeholder="Add your note about this lesson..."></textarea>
-                        <div class="flex justify-end mt-2">
-                            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
-                                Post Note
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Lessons data (same as before)
+        // Dados das lições
         const lessons = [
-            {
-                id: 1,
-                title: "Greetings and Farewells",
-                description: "Learn how to greet people and say goodbye in English in different situations.",
-                skills: ["Speaking", "Listening"],
-                activities: [
-                    { type: "matching", title: "Match the Greetings", description: "Drag the English phrases to match with their meanings." },
-                    { type: "recording", title: "Practice Pronunciation", description: "Record yourself saying common greetings." }
-                ],
-                icon: "handshake"
-            },
-            {
-                id: 2,
-                title: "Introducing Yourself",
-                description: "Learn how to introduce yourself and share basic personal information.",
-                skills: ["Speaking", "Writing"],
-                activities: [
-                    { type: "fill-blank", title: "Complete the Introduction", description: "Fill in the blanks to complete a proper self-introduction." }
-                ],
-                icon: "user"
-            },
-            // Add more lessons here...
+            { id: 1, title: "Greetings and Farewells", skills: ["Speaking", "Listening"], progress: 30 },
+            { id: 2, title: "Introducing Yourself", skills: ["Speaking", "Writing"], progress: 20 },
+            { id: 3, title: "The Alphabet and Spelling Words", skills: ["Listening", "Writing"], progress: 40 },
+            { id: 4, title: "Numbers (0–100+) and Saying Your Age", skills: ["Listening", "Speaking"], progress: 50 },
+            { id: 5, title: "Days of the Week and Months of the Year", skills: ["Reading", "Speaking"], progress: 60 },
+            { id: 6, title: "Colors and Shapes", skills: ["Listening", "Speaking"], progress: 70 },
+            { id: 7, title: "Family and Relationships", skills: ["Reading", "Writing"], progress: 80 },
+            { id: 8, title: "Parts of the Body and Physical Description", skills: ["Speaking", "Listening"], progress: 10 },
+            { id: 9, title: "Clothes and Accessories", skills: ["Listening", "Speaking"], progress: 25 },
+            { id: 10, title: "Food, Drinks, and Meals", skills: ["Speaking", "Listening"], progress: 35 },
+            { id: 11, title: "Telling the Time and Daily Routines", skills: ["Reading", "Speaking"], progress: 45 },
+            { id: 12, title: "The Verb 'To Be'", skills: ["Writing", "Speaking"], progress: 55 },
+            { id: 13, title: "The Verb 'Have/Has'", skills: ["Writing", "Speaking"], progress: 65 },
+            { id: 14, title: "Definite and Indefinite Articles", skills: ["Reading", "Writing"], progress: 75 },
+            { id: 15, title: "Personal and Possessive Pronouns", skills: ["Writing", "Speaking"], progress: 85 },
+            { id: 16, title: "Basic Adjectives", skills: ["Speaking", "Writing"], progress: 90 },
+            { id: 17, title: "This / That / These / Those", skills: ["Speaking", "Listening"], progress: 95 },
+            { id: 18, title: "There is / There are", skills: ["Writing", "Speaking"], progress: 15 },
+            { id: 19, title: "Prepositions of Place", skills: ["Speaking", "Listening"], progress: 5 },
+            { id: 20, title: "Simple Present Tense", skills: ["Writing", "Speaking"], progress: 25 },
+            { id: 21, title: "Yes/No Questions and Short Answers", skills: ["Speaking", "Listening"], progress: 35 },
+            { id: 22, title: "Making Simple Requests and Offers", skills: ["Speaking", "Listening"], progress: 45 },
+            { id: 23, title: "Likes and Dislikes", skills: ["Speaking", "Writing"], progress: 55 },
+            { id: 24, title: "Talking about Hobbies and Free Time", skills: ["Speaking", "Listening"], progress: 65 },
+            { id: 25, title: "Weather and Seasons", skills: ["Speaking", "Listening"], progress: 75 },
+            { id: 26, title: "Places in Town and Giving Directions", skills: ["Speaking", "Listening"], progress: 85 },
+            { id: 27, title: "Describing Your House or Apartment", skills: ["Speaking", "Writing"], progress: 95 },
+            { id: 28, title: "Classroom Objects and Commands", skills: ["Listening", "Speaking"], progress: 5 },
+            { id: 29, title: "Basic Shopping Vocabulary", skills: ["Speaking", "Listening"], progress: 15 },
+            { id: 30, title: "Jobs and Occupations", skills: ["Speaking", "Writing"], progress: 25 }
         ];
 
-        // DOM elements
-        const exploreBtn = document.getElementById('exploreBtn');
-        const lessonsSection = document.getElementById('lessonsSection');
-        const lessonsContainer = document.getElementById('lessonsContainer');
-        const lessonModal = document.getElementById('lessonModal');
-        const closeLessonModal = document.getElementById('closeLessonModal');
-        const lessonModalTitle = document.getElementById('lessonModalTitle');
-        const lessonDescription = document.getElementById('lessonDescription');
-        const lessonSkills = document.getElementById('lessonSkills');
-        const lessonActivities = document.getElementById('lessonActivities');
+        // Função para renderizar botões de lições
+        function renderLessonButtons() {
+            const lessonsContainer = document.getElementById('lessonsContainer');
+            lessonsContainer.innerHTML = '';
+            lessons.forEach((lesson, index) => {
+                const button = document.createElement('button');
+                button.className = 'lesson-button bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-lg w-full transition-all';
+                button.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-book text-indigo-600 text-lg"></i>
+                            </div>
+                            <h4 class="text-lg font-bold">${lesson.title}</h4>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 mr-1 relative">
+                                <svg class="w-full h-full" viewBox="0 0 36 36">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E5E7EB" stroke-width="3" stroke-dasharray="100, 100"/>
+                                    <path class="progress-ring__circle" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#4F46E5" stroke-width="3" stroke-dasharray="${lesson.progress}, 100"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700">${lesson.progress}%</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                button.onclick = () => alert(`Opening details for lesson: ${lesson.title}`);
+                lessonsContainer.appendChild(button);
+            });
+        }
 
-        // Show lessons when Explore button is clicked
-        exploreBtn.addEventListener('click', function() {
-            lessonsSection.classList.remove('hidden');
-            exploreBtn.classList.add('hidden');
+        // Mostrar botões ao clicar no botão "Explore Lessons"
+        document.getElementById('exploreBtn').addEventListener('click', function() {
+            document.getElementById('lessonsSection').classList.remove('hidden');
+            this.classList.add('hidden');
             renderLessonButtons();
             setTimeout(() => {
                 const buttons = document.querySelectorAll('.lesson-button');
@@ -296,67 +169,7 @@
             }, 100);
         });
 
-        // Render lesson buttons
-        function renderLessonButtons() {
-            lessonsContainer.innerHTML = '';
-            lessons.forEach(lesson => {
-                const button = document.createElement('button');
-                button.className = 'lesson-button bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-lg w-full transition-all';
-                button.innerHTML = `
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-${lesson.icon} text-indigo-600 text-lg"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-bold">${lesson.title}</h4>
-                            <p class="text-sm text-gray-200 line-clamp-2">${lesson.description}</p>
-                        </div>
-                    </div>
-                `;
-                button.onclick = () => openLessonModal(lesson.id);
-                lessonsContainer.appendChild(button);
-            });
-        }
-
-        // Open lesson modal
-        window.openLessonModal = function(lessonId) {
-            const lesson = lessons.find(l => l.id === lessonId);
-            if (!lesson) return;
-
-            lessonModalTitle.textContent = lesson.title;
-            lessonDescription.textContent = lesson.description;
-
-            lessonSkills.innerHTML = lesson.skills.map(skill => `
-                <span class="skill-tag px-3 py-1 bg-${getSkillColor(skill)}-100 text-${getSkillColor(skill)}-800 text-sm rounded-full">
-                    ${skill}
-                </span>
-            `).join('');
-
-            lessonActivities.innerHTML = lesson.activities.map(activity => `
-                <div class="bg-white p-4 rounded-lg border border-gray-200">
-                    <div class="flex items-start">
-                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                            <i class="fas fa-${getActivityIcon(activity.type)} text-indigo-600"></i>
-                        </div>
-                        <div>
-                            <h5 class="font-medium text-gray-800">${activity.title}</h5>
-                            <p class="text-sm text-gray-600">${activity.description}</p>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-
-            lessonModal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        };
-
-        // Close lesson modal
-        closeLessonModal.addEventListener('click', function() {
-            lessonModal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        });
-
-        // Get color for skill tag
+        // Função para obter cor baseada na habilidade
         function getSkillColor(skill) {
             const colors = {
                 'Reading': 'blue',
@@ -365,20 +178,6 @@
                 'Listening': 'purple'
             };
             return colors[skill] || 'indigo';
-        }
-
-        // Get icon for activity type
-        function getActivityIcon(type) {
-            const icons = {
-                'matching': 'random',
-                'recording': 'microphone',
-                'quiz': 'question-circle',
-                'game': 'gamepad',
-                'fill-blank': 'edit',
-                'writing': 'pen',
-                'audio': 'volume-up'
-            };
-            return icons[type] || 'tasks';
         }
     </script>
 </body>
