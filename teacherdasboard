@@ -1,0 +1,597 @@
+import React, { useState, useMemo } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+// Interfaces (Types)
+interface Student {
+  id: number;
+  name: string;
+  email: string;
+  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Not Placed';
+  overallProgress: number; // Percentage 0-100
+  skills: {
+    listening: number;
+    speaking: number;
+    reading: number;
+    writing: number;
+    grammar: number;
+    pronunciation: number;
+  };
+  lastActivity: string;
+  placementTestScore?: number;
+  classId?: number;
+}
+
+interface ClassGroup {
+  id: number;
+  name: string;
+  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Mixed';
+  studentIds: number[];
+}
+
+interface LessonPlan {
+    id: number;
+    title: string;
+    level: 'Beginner' | 'Intermediate' | 'Advanced';
+    topic: string;
+    fileUrl?: string; // Placeholder
+}
+
+interface Resource {
+    id: number;
+    title: string;
+    type: 'Grammar' | 'Pronunciation' | 'Vocabulary';
+    level: 'Beginner' | 'Intermediate' | 'Advanced' | 'All';
+    content: string; // or URL
+}
+
+type View = 'overview' | 'students' | 'studentDetail' | 'createClass' | 'registerStudent' | 'placementTest' | 'feedback' | 'lessonPlans' | 'grammar' | 'levels' | 'skills' | 'pronunciation' | 'profile' | 'email';
+
+// Mock Data
+const MOCK_STUDENTS: Student[] = [
+  { id: 1, name: 'Alice Wonderland', email: 'alice@example.com', level: 'Intermediate', overallProgress: 75, skills: { listening: 80, speaking: 70, reading: 85, writing: 65, grammar: 78, pronunciation: 72 }, lastActivity: '2023-10-25', classId: 101 },
+  { id: 2, name: 'Bob The Builder', email: 'bob@example.com', level: 'Beginner', overallProgress: 40, skills: { listening: 50, speaking: 30, reading: 45, writing: 35, grammar: 42, pronunciation: 38 }, lastActivity: '2023-10-24', placementTestScore: 35, classId: 102 },
+  { id: 3, name: 'Charlie Chaplin', email: 'charlie@example.com', level: 'Advanced', overallProgress: 92, skills: { listening: 95, speaking: 90, reading: 94, writing: 88, grammar: 93, pronunciation: 91 }, lastActivity: '2023-10-26', classId: 101 },
+  { id: 4, name: 'Diana Prince', email: 'diana@example.com', level: 'Intermediate', overallProgress: 60, skills: { listening: 65, speaking: 55, reading: 70, writing: 50, grammar: 62, pronunciation: 58 }, lastActivity: '2023-10-23', classId: 102 },
+  { id: 5, name: 'Ethan Hunt', email: 'ethan@example.com', level: 'Not Placed', overallProgress: 0, skills: { listening: 0, speaking: 0, reading: 0, writing: 0, grammar: 0, pronunciation: 0 }, lastActivity: 'Never', placementTestScore: undefined },
+];
+
+const MOCK_CLASSES: ClassGroup[] = [
+  { id: 101, name: 'Morning Stars', level: 'Mixed', studentIds: [1, 3] },
+  { id: 102, name: 'Afternoon Achievers', level: 'Beginner', studentIds: [2, 4] },
+];
+
+const MOCK_LESSONS: LessonPlan[] = [
+    { id: 1, title: 'Introduction to Past Simple', level: 'Beginner', topic: 'Grammar' },
+    { id: 2, title: 'Ordering Food', level: 'Intermediate', topic: 'Speaking' },
+    { id: 3, title: 'Understanding News Headlines', level: 'Advanced', topic: 'Reading' },
+];
+
+const MOCK_RESOURCES: Resource[] = [
+    { id: 1, title: 'Present Perfect Tense', type: 'Grammar', level: 'Intermediate', content: 'Explanation and examples...' },
+    { id: 2, title: 'TH Sound Practice', type: 'Pronunciation', level: 'All', content: 'Audio exercises...' },
+    { id: 3, title: 'Common Phrasal Verbs', type: 'Vocabulary', level: 'Advanced', content: 'List and definitions...' },
+];
+
+
+// Helper Component for Progress Bar
+const ProgressBar: React.FC<{ progress: number }> = ({ progress }) => (
+  <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+    <div
+      className="bg-blue-600 h-2.5 rounded-full"
+      style={{ width: `${progress}%` }}
+    ></div>
+  </div>
+);
+
+// Main Dashboard Component
+const TeacherDashboard: React.FC = () => {
+  const [currentView, setCurrentView] = useState<View>('overview');
+  const [students, setStudents] = useState<Student[]>(MOCK_STUDENTS);
+  const [classes, setClasses] = useState<ClassGroup[]>(MOCK_CLASSES);
+  const [lessons, setLessons] = useState<LessonPlan[]>(MOCK_LESSONS);
+  const [resources, setResources] = useState<Resource[]>(MOCK_RESOURCES);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+
+  // State for forms
+  const [newClassName, setNewClassName] = useState('');
+  const [newClassLevel, setNewClassLevel] = useState<'Beginner' | 'Intermediate' | 'Advanced' | 'Mixed'>('Mixed');
+  const [newStudentName, setNewStudentName] = useState('');
+  const [newStudentEmail, setNewStudentEmail] = useState('');
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [emailRecipient, setEmailRecipient] = useState('');
+  const [feedbackText, setFeedbackText] = useState('');
+
+  const handleCreateClass = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newClassName) return;
+    const newClass: ClassGroup = {
+      id: Date.now(), // simple unique id
+      name: newClassName,
+      level: newClassLevel,
+      studentIds: [],
+    };
+    setClasses([...classes, newClass]);
+    setNewClassName('');
+    setNewClassLevel('Mixed');
+    setCurrentView('overview'); // Or stay on the page? Redirect to overview for now.
+    alert('Class created successfully!');
+  };
+
+  const handleRegisterStudent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStudentName || !newStudentEmail) return;
+    const newStudent: Student = {
+      id: Date.now(),
+      name: newStudentName,
+      email: newStudentEmail,
+      level: 'Not Placed',
+      overallProgress: 0,
+      skills: { listening: 0, speaking: 0, reading: 0, writing: 0, grammar: 0, pronunciation: 0 },
+      lastActivity: 'Never',
+    };
+    setStudents([...students, newStudent]);
+    setNewStudentName('');
+    setNewStudentEmail('');
+    setCurrentView('students');
+    alert('Student registered successfully!');
+  };
+
+  const handleSendEmail = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!emailRecipient || !emailSubject || !emailBody) {
+          alert('Please fill in all email fields.');
+          return;
+      }
+      // In a real app, this would trigger an API call
+      console.log(`Sending email to ${emailRecipient} with subject "${emailSubject}"`);
+      alert(`Email simulation: Sent to ${emailRecipient}`);
+      setEmailRecipient('');
+      setEmailSubject('');
+      setEmailBody('');
+  };
+
+  const handleSendFeedback = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!selectedStudent || !feedbackText) {
+          alert('Please select a student and write feedback.');
+          return;
+      }
+      // In a real app, save feedback to DB associated with the student
+      console.log(`Sending feedback for ${selectedStudent.name}: ${feedbackText}`);
+      alert(`Feedback for ${selectedStudent.name} submitted (simulated).`);
+      setFeedbackText('');
+  };
+
+  const viewStudentDetail = (student: Student) => {
+    setSelectedStudent(student);
+    setCurrentView('studentDetail');
+  };
+
+  const totalStudents = students.length;
+  const averageCompletion = useMemo(() => {
+    if (students.length === 0) return 0;
+    const totalProgress = students.reduce((sum, s) => sum + s.overallProgress, 0);
+    return Math.round(totalProgress / students.length);
+  }, [students]);
+
+  const progressData = useMemo(() => {
+    const levels: Record<string, number> = { 'Beginner': 0, 'Intermediate': 0, 'Advanced': 0, 'Not Placed': 0 };
+    students.forEach(s => {
+      levels[s.level]++;
+    });
+    return [
+      { name: 'Beginner', count: levels['Beginner'] },
+      { name: 'Intermediate', count: levels['Intermediate'] },
+      { name: 'Advanced', count: levels['Advanced'] },
+      { name: 'Not Placed', count: levels['Not Placed'] },
+    ];
+  }, [students]);
+
+
+  const renderContent = () => {
+    switch (currentView) {
+      case 'overview':
+        return (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Dashboard Overview</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="bg-white p-4 rounded-lg shadow">
+                <h3 className="text-lg font-medium text-gray-600">Total Students</h3>
+                <p className="text-3xl font-bold text-blue-600">{totalStudents}</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <h3 className="text-lg font-medium text-gray-600">Total Classes</h3>
+                <p className="text-3xl font-bold text-blue-600">{classes.length}</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <h3 className="text-lg font-medium text-gray-600">Avg. Completion</h3>
+                <p className="text-3xl font-bold text-blue-600">{averageCompletion}%</p>
+                <ProgressBar progress={averageCompletion} />
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow mb-6">
+                 <h3 className="text-lg font-medium text-gray-700 mb-2">Student Distribution by Level</h3>
+                 <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={progressData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis allowDecimals={false} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="count" fill="#3b82f6" name="Number of Students" />
+                    </BarChart>
+                </ResponsiveContainer>
+            </div>
+          </div>
+        );
+      case 'students':
+        return (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Manage Students</h2>
+             <div className="bg-white p-4 rounded-lg shadow">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {students.map((student) => (
+                        <tr key={student.id}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{student.name}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.email}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.level}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <ProgressBar progress={student.overallProgress} />
+                                <span className="text-xs ml-2">{student.overallProgress}%</span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button onClick={() => viewStudentDetail(student)} className="text-blue-600 hover:text-blue-800">View Details</button>
+                            </td>
+                        </tr>
+                        ))}
+                    </tbody>
+                </table>
+             </div>
+          </div>
+        );
+       case 'studentDetail':
+        if (!selectedStudent) return <p>No student selected.</p>;
+        return (
+          <div>
+            <button onClick={() => setCurrentView('students')} className="mb-4 text-sm text-blue-600 hover:underline">&larr; Back to Students</button>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Student Details: {selectedStudent.name}</h2>
+            <div className="bg-white p-6 rounded-lg shadow mb-6">
+              <h3 className="text-xl font-semibold mb-3 text-gray-700">Progress Overview</h3>
+              <div className="mb-4">
+                <p className="text-sm font-medium text-gray-600">Overall Progress: {selectedStudent.overallProgress}%</p>
+                <ProgressBar progress={selectedStudent.overallProgress} />
+              </div>
+              <p className="text-sm text-gray-600 mb-1"><span className="font-medium">Level:</span> {selectedStudent.level}</p>
+              {selectedStudent.placementTestScore !== undefined && (
+                <p className="text-sm text-gray-600 mb-1"><span className="font-medium">Placement Score:</span> {selectedStudent.placementTestScore}</p>
+              )}
+               <p className="text-sm text-gray-600 mb-3"><span className="font-medium">Last Activity:</span> {selectedStudent.lastActivity}</p>
+
+              <h4 className="text-lg font-semibold mb-2 text-gray-700">Skills Breakdown</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                {Object.entries(selectedStudent.skills).map(([skill, progress]) => (
+                    <div key={skill}>
+                        <p className="text-sm font-medium text-gray-600 capitalize">{skill}: {progress}%</p>
+                        <ProgressBar progress={progress} />
+                    </div>
+                ))}
+              </div>
+            </div>
+
+             <div className="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 className="text-xl font-semibold mb-3 text-gray-700">Feedback</h3>
+                 <form onSubmit={handleSendFeedback}>
+                    <textarea
+                        value={feedbackText}
+                        onChange={(e) => setFeedbackText(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        rows={4}
+                        placeholder={`Write feedback for ${selectedStudent.name}...`}
+                    />
+                    <button type="submit" className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Send Feedback</button>
+                </form>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow">
+                <h3 className="text-xl font-semibold mb-3 text-gray-700">Certificate</h3>
+                {selectedStudent.level !== 'Not Placed' && selectedStudent.overallProgress >= 85 ? (
+                     <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Generate {selectedStudent.level} Certificate</button>
+                ) : (
+                    <p className="text-sm text-gray-500">Certificate available upon reaching 85% completion for the current level.</p>
+                )}
+            </div>
+          </div>
+        );
+       case 'createClass':
+        return (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Create New Class</h2>
+            <div className="bg-white p-6 rounded-lg shadow">
+                 <form onSubmit={handleCreateClass}>
+                    <div className="mb-4">
+                        <label htmlFor="className" className="block text-sm font-medium text-gray-700 mb-1">Class Name</label>
+                        <input
+                        type="text"
+                        id="className"
+                        value={newClassName}
+                        onChange={(e) => setNewClassName(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="classLevel" className="block text-sm font-medium text-gray-700 mb-1">Level</label>
+                        <select
+                            id="classLevel"
+                            value={newClassLevel}
+                            onChange={(e) => setNewClassLevel(e.target.value as any)}
+                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white"
+                            required
+                        >
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                            <option value="Mixed">Mixed</option>
+                        </select>
+                    </div>
+                    <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Create Class</button>
+                </form>
+            </div>
+             <h3 className="text-xl font-semibold mt-6 mb-3 text-gray-800">Existing Classes</h3>
+             <div className="bg-white p-4 rounded-lg shadow">
+                 <ul className="divide-y divide-gray-200">
+                     {classes.map(cls => (
+                         <li key={cls.id} className="py-3 flex justify-between items-center">
+                             <span className="text-gray-800 font-medium">{cls.name} ({cls.level})</span>
+                             <span className="text-sm text-gray-500">{cls.studentIds.length} students</span>
+                         </li>
+                     ))}
+                 </ul>
+             </div>
+          </div>
+        );
+      case 'registerStudent':
+        return (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Register New Student</h2>
+            <div className="bg-white p-6 rounded-lg shadow">
+                <form onSubmit={handleRegisterStudent}>
+                    <div className="mb-4">
+                        <label htmlFor="studentName" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input
+                        type="text"
+                        id="studentName"
+                        value={newStudentName}
+                        onChange={(e) => setNewStudentName(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        required
+                        />
+                    </div>
+                     <div className="mb-4">
+                        <label htmlFor="studentEmail" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input
+                        type="email"
+                        id="studentEmail"
+                        value={newStudentEmail}
+                        onChange={(e) => setNewStudentEmail(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        required
+                        />
+                    </div>
+                    {/* Add class assignment dropdown later if needed */}
+                    <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Register Student</button>
+                </form>
+            </div>
+          </div>
+        );
+      case 'placementTest':
+          return (
+              <div>
+                  <h2 className="text-2xl font-semibold mb-4 text-gray-800">Placement Test</h2>
+                  <div className="bg-white p-6 rounded-lg shadow">
+                      <p className="text-gray-700 mb-4">
+                          The placement test helps determine the appropriate starting level for new students. You can assign the test to newly registered students who are marked as 'Not Placed'.
+                      </p>
+                      {/* Placeholder for actual test assignment/viewing results */}
+                      <h3 className="text-lg font-semibold mb-2 text-gray-700">Assign Test</h3>
+                       <p className="text-sm text-gray-500 mb-4">Select students marked as 'Not Placed' from the 'Students' list to assign the test (Functionality TBC).</p>
+                      <button className="px-4 py-2 bg-gray-400 text-white rounded-md cursor-not-allowed" disabled>Assign Test (TBC)</button>
+                  </div>
+              </div>
+          );
+      case 'feedback':
+           return (
+              <div>
+                  <h2 className="text-2xl font-semibold mb-4 text-gray-800">General Feedback Area</h2>
+                  <div className="bg-white p-6 rounded-lg shadow">
+                      <p className="text-gray-700 mb-4">
+                          This area is for general feedback or notes. For student-specific feedback, please navigate to the student's detail page.
+                      </p>
+                      {/* Placeholder for general feedback form/log */}
+                      <textarea
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        rows={5}
+                        placeholder="Enter general notes or feedback here..."
+                      />
+                        <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Save Note (TBC)</button>
+                  </div>
+              </div>
+          );
+       case 'lessonPlans':
+            return (
+                <div>
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-800">Lesson Plans</h2>
+                     <div className="bg-white p-4 rounded-lg shadow">
+                          <div className="mb-4 flex justify-end">
+                               <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Create New Lesson Plan (TBC)</button>
+                          </div>
+                         <ul className="divide-y divide-gray-200">
+                             {lessons.map(lesson => (
+                                 <li key={lesson.id} className="py-3 flex justify-between items-center">
+                                     <div>
+                                        <p className="text-gray-800 font-medium">{lesson.title}</p>
+                                        <p className="text-sm text-gray-500">Level: {lesson.level} | Topic: {lesson.topic}</p>
+                                     </div>
+                                     <button className="text-sm text-blue-600 hover:underline">View/Edit (TBC)</button>
+                                 </li>
+                             ))}
+                         </ul>
+                     </div>
+                </div>
+            );
+        case 'grammar':
+        case 'pronunciation':
+        case 'levels': // Could show level descriptions
+        case 'skills': // Could show skill descriptions/benchmarks
+             const resourceType = currentView === 'grammar' ? 'Grammar' : currentView === 'pronunciation' ? 'Pronunciation' : '';
+             const filteredResources = resources.filter(r => r.type.toLowerCase() === currentView || (currentView === 'levels' || currentView === 'skills')); // Simplified filter
+             const title = currentView.charAt(0).toUpperCase() + currentView.slice(1);
+
+             return (
+                 <div>
+                     <h2 className="text-2xl font-semibold mb-4 text-gray-800">{title} Resources</h2>
+                      <div className="bg-white p-4 rounded-lg shadow">
+                           { (currentView === 'grammar' || currentView === 'pronunciation') ? (
+                               <ul className="divide-y divide-gray-200">
+                                   {filteredResources.map(resource => (
+                                       <li key={resource.id} className="py-3">
+                                            <p className="text-gray-800 font-medium">{resource.title} ({resource.level})</p>
+                                            <p className="text-sm text-gray-600 mt-1">{resource.content.substring(0,100)}...</p>
+                                           <button className="text-sm text-blue-600 hover:underline mt-1">View More (TBC)</button>
+                                       </li>
+                                   ))}
+                               </ul>
+                           ) : (
+                               <p className="text-gray-600">Content for '{title}' section (e.g., level descriptions, skill benchmarks) will be displayed here. (TBC)</p>
+                           )}
+                            <div className="mt-4 flex justify-end">
+                               <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Add New Resource (TBC)</button>
+                          </div>
+                      </div>
+                 </div>
+             );
+        case 'profile':
+             return (
+                 <div>
+                     <h2 className="text-2xl font-semibold mb-4 text-gray-800">Teacher Profile</h2>
+                     <div className="bg-white p-6 rounded-lg shadow">
+                         <div className="flex items-center mb-4">
+                              <div className="bg-gray-200 border-2 border-dashed rounded-full w-16 h-16 mr-4" />
+                              <div>
+                                 <p className="text-lg font-medium text-gray-800">Teacher Name (Placeholder)</p>
+                                 <p className="text-sm text-gray-500">teacher@example.com</p>
+                              </div>
+                         </div>
+                         {/* Placeholder for profile editing form */}
+                         <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Edit Profile (TBC)</button>
+                     </div>
+                 </div>
+             );
+        case 'email':
+             return (
+                 <div>
+                     <h2 className="text-2xl font-semibold mb-4 text-gray-800">Send Email</h2>
+                     <div className="bg-white p-6 rounded-lg shadow">
+                         <form onSubmit={handleSendEmail}>
+                              <div className="mb-4">
+                                  <label htmlFor="emailRecipient" className="block text-sm font-medium text-gray-700 mb-1">To (Email Address or Group)</label>
+                                  <input
+                                  type="text" // Could be email or group name - simple text for now
+                                  id="emailRecipient"
+                                  value={emailRecipient}
+                                  onChange={(e) => setEmailRecipient(e.target.value)}
+                                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="student@example.com or 'Morning Stars Class'"
+                                  required
+                                  />
+                              </div>
+                               <div className="mb-4">
+                                  <label htmlFor="emailSubject" className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                                  <input
+                                  type="text"
+                                  id="emailSubject"
+                                  value={emailSubject}
+                                  onChange={(e) => setEmailSubject(e.target.value)}
+                                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                  required
+                                  />
+                              </div>
+                               <div className="mb-4">
+                                  <label htmlFor="emailBody" className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                                  <textarea
+                                      id="emailBody"
+                                      value={emailBody}
+                                      onChange={(e) => setEmailBody(e.target.value)}
+                                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                      rows={6}
+                                      required
+                                  />
+                              </div>
+                             <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Send Email</button>
+                         </form>
+                     </div>
+                 </div>
+             );
+
+      default:
+        return <p>Welcome to your Dashboard!</p>;
+    }
+  };
+
+  const NavLink: React.FC<{ view: View; label: string; current: View; setView: (view: View) => void }> = ({ view, label, current, setView }) => (
+    <button
+      onClick={() => setView(view)}
+      className={`block w-full text-left px-4 py-2 rounded-md text-sm font-medium ${
+        current === view
+          ? 'bg-blue-700 text-white'
+          : 'text-gray-200 hover:bg-blue-500 hover:text-white'
+      }`}
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className="w-64 bg-blue-800 text-white flex flex-col p-4 space-y-2">
+        <h1 className="text-2xl font-bold mb-4 px-2">Teacher Dashboard</h1>
+        <NavLink view="overview" label="Overview" current={currentView} setView={setCurrentView} />
+        <NavLink view="students" label="Students" current={currentView} setView={setCurrentView} />
+        <NavLink view="createClass" label="Classes" current={currentView} setView={setCurrentView} />
+        <NavLink view="registerStudent" label="Register Student" current={currentView} setView={setCurrentView} />
+        <NavLink view="placementTest" label="Placement Test" current={currentView} setView={setCurrentView} />
+        {/* <NavLink view="feedback" label="Feedback Area" current={currentView} setView={setCurrentView} /> */}
+        <NavLink view="lessonPlans" label="Lesson Plans" current={currentView} setView={setCurrentView} />
+        <NavLink view="grammar" label="Grammar" current={currentView} setView={setCurrentView} />
+        <NavLink view="pronunciation" label="Pronunciation" current={currentView} setView={setCurrentView} />
+        <NavLink view="skills" label="Skills Info" current={currentView} setView={setCurrentView} />
+        <NavLink view="levels" label="Levels Info" current={currentView} setView={setCurrentView} />
+         <NavLink view="email" label="Send Email" current={currentView} setView={setCurrentView} />
+
+        <div className="mt-auto"> {/* Pushes profile to bottom */}
+           <NavLink view="profile" label="Profile" current={currentView} setView={setCurrentView} />
+           {/* Add Logout later */}
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <main className="flex-1 p-6 overflow-y-auto">
+        {renderContent()}
+      </main>
+    </div>
+  );
+};
+
+export default TeacherDashboard;
