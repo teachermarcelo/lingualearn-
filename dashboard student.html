@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/recharts/umd/Recharts.min.js"></script>
+    <style>
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #3b82f6;
+            transition: width 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+    <!-- Header -->
+    <header class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Welcome back, Alex!</h1>
+        <p class="text-gray-600 mt-1">Let's continue your learning journey.</p>
+    </header>
+
+    <!-- Quick Stats Grid -->
+    <section class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-700 mb-4">Your Quick Stats</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-lg shadow-md flex items-center space-x-3 transition-transform hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <div>
+                    <p class="text-sm text-gray-500">Current Level</p>
+                    <p class="text-xl font-semibold text-gray-800">B1</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md flex items-center space-x-3 transition-transform hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <div>
+                    <p class="text-sm text-gray-500">Lessons Completed</p>
+                    <p class="text-xl font-semibold text-gray-800">12</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md flex items-center space-x-3 transition-transform hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4M4 7l8 5 8-5M12 22V12" />
+                </svg>
+                <div>
+                    <p class="text-sm text-gray-500">Vocabulary Learned</p>
+                    <p class="text-xl font-semibold text-gray-800">87</p>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md flex items-center space-x-3 transition-transform hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                <div>
+                    <p class="text-sm text-gray-500">Tests Taken</p>
+                    <p class="text-xl font-semibold text-gray-800">5</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Overview Section -->
+    <section class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Overall Progress -->
+        <div class="md:col-span-1 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Overall Progress</h2>
+            <div class="flex flex-col items-center">
+                <div class="relative w-32 h-32 mb-3">
+                    <svg class="w-full h-full" viewBox="0 0 36 36">
+                        <path
+                            class="text-gray-200"
+                            stroke-width="3"
+                            fill="none"
+                            stroke="currentColor"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        <path
+                            class="text-blue-500"
+                            stroke-width="3"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-dasharray="68, 100"
+                            stroke-linecap="round"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-2xl font-bold text-blue-600">68%</span>
+                    </div>
+                </div>
+                <p class="text-center text-gray-600">You're doing great! Keep it up.</p>
+            </div>
+        </div>
+
+        <!-- Progress by Level -->
+        <div class="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Progress by Level</h2>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">A1</p>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-600">A2</p>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-600">B1</p>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 70%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-600">B2</p>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-600">C1</p>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-600">C2</p>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-3">You are currently working on Level B1.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skill Progress & Placement Test -->
+    <section class="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Progress by Skills -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Progress by Skills</h2>
+            <div style="width: 100%; height: 320px;">
+                <svg id="radarChart" viewBox="0 0 360 360"></svg>
+            </div>
+        </div>
+
+        <!-- Placement Test & Vocabulary -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- Placement Test -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold text-gray-700 mb-3">Placement Test</h2>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-600">Assigned Level:</span>
+                    <span class="font-semibold text-blue-600">B1</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Score:</span>
+                    <span class="font-semibold text-green-600">82%</span>
+                </div>
+                <button class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-sm">
+                    View Details
+                </button>
+            </div>
+
+            <!-- Vocabulary Focus -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold text-gray-700 mb-3">Vocabulary Focus</h2>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-gray-600">Total Learned:</span>
+                    <span class="font-semibold text-gray-800">87 words</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" style="width: 8.7%;"></div>
+                </div>
+                <button class="mt-4 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-sm">
+                    Practice Vocabulary
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Render Radar Chart using Recharts
+        const skillData = [
+            { skill: 'Reading', progress: 85, fullMark: 100 },
+            { skill: 'Writing', progress: 70, fullMark: 100 },
+            { skill: 'Listening', progress: 92, fullMark: 100 },
+            { skill: 'Speaking', progress: 65, fullMark: 100 },
+            { skill: 'Grammar', progress: 78, fullMark: 100 },
+            { skill: 'Vocabulary', progress: 88, fullMark: 100 },
+        ];
+
+        const RadarChart = Recharts.RadarChart;
+        const PolarGrid = Recharts.PolarGrid;
+        const PolarAngleAxis = Recharts.PolarAngleAxis;
+        const PolarRadiusAxis = Recharts.PolarRadiusAxis;
+        const Radar = Recharts.Radar;
+        const Tooltip = Recharts.Tooltip;
+        const Legend = Recharts.Legend;
+
+        const radarChart = (
+            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={skillData}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="skill" tick={{ fill: '#4b5563', fontSize: 12 }} />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#6b7280', fontSize: 10 }} />
+                <Radar name="Alex" dataKey="progress" stroke="#3b82f6" fill="#60a5fa" fillOpacity={0.6} />
+                <Tooltip contentStyle={{ backgroundColor: 'white', borderRadius: '8px', borderColor: '#e5e7eb' }} />
+                <Legend wrapperStyle={{ paddingTop: '20px' }} />
+            </RadarChart>
+        );
+
+        ReactDOM.render(radarChart, document.getElementById('radarChart'));
+    </script>
+</body>
+</html>
