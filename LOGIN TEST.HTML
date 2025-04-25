@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login com GitHub & Signup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Animação fade-in */
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-600 to-emerald-500 min-h-screen flex items-center justify-center p-4">
+
+  <!-- Container Login/Signup -->
+  <div id="loginPage" class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 text-center fade-in">
+    <h1 class="text-4xl font-bold text-indigo-700 mb-4">Bem-vindo ao Sistema de Login</h1>
+    <p class="text-slate-600 mb-6">Faça login para continuar ou crie uma nova conta</p>
+
+    <!-- Abas -->
+    <div class="flex justify-center gap-8 mb-6">
+      <button id="loginTab" class="border-b-2 border-indigo-700 text-indigo-700 font-semibold pb-2" onclick="switchToLogin()">Login</button>
+      <button id="signupTab" class="border-b-2 border-transparent text-slate-500 hover:text-indigo-700 font-semibold pb-2" onclick="switchToSignup()">Cadastro</button>
+    </div>
+
+    <!-- Formulário Login -->
+    <form id="loginForm" class="space-y-5" onsubmit="event.preventDefault(); login();">
+      <input
+        type="email"
+        id="loginEmail"
+        placeholder="Email"
+        required
+        class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
+      <input
+        type="password"
+        id="loginPassword"
+        placeholder="Senha"
+        required
+        class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
+
+      <button
+        type="submit"
+        id="loginBtn"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-md transition duration-300">
+        Login com GitHub
+      </button>
+    </form>
+
+    <!-- Formulário Signup -->
+    <form id="signupForm" class="hidden space-y-5" onsubmit="event.preventDefault(); signup();">
+      <input
+        type="text"
+        id="signupName"
+        placeholder="Nome completo"
+        required
+        class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
+      <input
+        type="email"
+        id="signupEmail"
+        placeholder="Email"
+        required
+        class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
+      <input
+        type="password"
+        id="signupPassword"
+        placeholder="Senha"
+        required
+        class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
+
+      <button
+        type="submit"
+        id="signupBtn"
+        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-md transition duration-300">
+        Criar Conta
+      </button>
+    </form>
+
+    <p id="message" class="mt-5 min-h-[1.25rem] text-sm text-red-500"></p>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboardPage" class="hidden max-w-3xl mx-auto p-8 bg-white rounded-xl shadow-xl w-full fade-in text-center">
+    <h2 class="text-3xl font-bold text-indigo-700 mb-6">Dashboard</h2>
+    <p id="welcomeMsg" class="mb-8 text-gray-700">Bem-vindo ao painel!</p>
+    <button
+      id="logoutBtn"
+      class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-md transition duration-200"
+      onclick="logout()">
+      Sair
+    </button>
+  </div>
+
+<script>
+  // Elementos
+  const loginTab = document.getElementById('loginTab');
+  const signupTab = document.getElementById('signupTab');
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  const message = document.getElementById('message');
+  const loginPage = document.getElementById('loginPage');
+  const dashboardPage = document.getElementById('dashboardPage');
+  const welcomeMsg = document.getElementById('welcomeMsg');
+
+  // Alternar entre abas
+  function switchToLogin() {
+    message.textContent = '';
+    loginTab.classList.add('border-indigo-700', 'text-indigo-700');
+    signupTab.classList.remove('border-indigo-700', 'text-indigo-700');
+    signupTab.classList.add('text-slate-500');
+    loginForm.classList.remove('hidden');
+    signupForm.classList.add('hidden');
+  }
+
+  function switchToSignup() {
+    message.textContent = '';
+    signupTab.classList.add('border-indigo-700', 'text-indigo-700');
+    loginTab.classList.remove('border-indigo-700', 'text-indigo-700');
+    loginTab.classList.add('text-slate-500');
+    signupForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+  }
+
+  // Simular login (substitua pela integração real)
+  function login() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    if (!email || !password) {
+      message.textContent = 'Por favor, preencha todos os campos.';
+      return;
+    }
+    message.textContent = '';
+    // Simula sucesso
+    alert(`Logado como ${email}`);
+    loginPage.classList.add('hidden');
+    dashboardPage.classList.remove('hidden');
+    welcomeMsg.textContent = `Olá, ${email}! Bem-vindo ao painel.`;
+  }
+
+  // Simular signup (substitua pela integração real)
+  function signup() {
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value.trim();
+
+    if (!name || !email || !password) {
+      message.textContent = 'Por favor, preencha todos os campos.';
+      return;
+    }
+    message.textContent = '';
+    alert(`Conta criada para ${name} (${email})! Agora faça login.`);
+    switchToLogin();
+  }
+
+  // Logout
+  function logout() {
+    loginPage.classList.remove('hidden');
+    dashboardPage.classList.add('hidden');
+    message.textContent = 'Você saiu com sucesso.';
+  }
+
+  // Inicializa na aba login
+  switchToLogin();
+</script>
+
+</body>
+</html>
