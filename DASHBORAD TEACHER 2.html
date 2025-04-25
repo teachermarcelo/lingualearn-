@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Teacher Dashboard - HTML+JS</title>
+<style>
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0; height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f3f4f6;
+    display: flex;
+    color: #1f2937;
+  }
+
+  /* Sidebar */
+  #sidebar {
+    width: 250px;
+    background-color: #2563eb;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+  }
+  #sidebar h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 20px 20px;
+  }
+  #sidebar nav {
+    flex-grow: 1;
+  }
+  #sidebar button {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 14px 30px;
+    text-align: left;
+    font-size: 15px;
+    color: #dbeafe;
+    cursor: pointer;
+    border-left: 4px solid transparent;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  #sidebar button:hover {
+    background-color: #3b82f6;
+    color: white;
+  }
+  #sidebar button.active {
+    background-color: white;
+    color: #2563eb;
+    font-weight: 600;
+    border-left-color: #2563eb;
+  }
+  #sidebar footer {
+    padding: 20px;
+    font-size: 14px;
+    border-top: 1px solid #93c5fd;
+  }
+
+  /* Main area */
+  main {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 24px 40px;
+    background-color: #e5e7eb;
+  }
+
+  /* Headings */
+  h2 {
+    margin-top:0;
+    margin-bottom:20px;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: #111827;
+  }
+  h3 {
+    margin-bottom: 10px;
+    color: #374151;
+  }
+
+  /* Card */
+  .card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
+    margin-bottom: 20px;
+  }
+
+  /* Progress Bar */
+  .progress-bar {
+    width: 100%;
+    background: #e0e7ff;
+    border-radius: 15px;
+    height: 16px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .progress-bar-fill {
+    background: #2563eb;
+    height: 100%;
+    border-radius: 15px 0 0 15px;
+    transition: width 0.3s ease-in-out;
+  }
+  .progress-text {
+    margin-left: 10px;
+    font-size: 0.85rem;
+    color: #374151;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+  }
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+  }
+  th {
+    background-color: #f3f4f6;
+    border-bottom: 2px solid #e5e7eb;
+    color: #374151;
+    font-weight: 600;
+  }
+  tr:not(:last-child) td {
+    border-bottom: 1px solid #e5e7eb;
+  }
+  tr:hover {
+    background-color: #eff6ff;
+  }
+
+  /* Button */
+  button.action-btn, button.submit-btn {
+    background-color: #2563eb;
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+    user-select: none;
+  }
+  button.action-btn:hover, button.submit-btn:hover {
+    background-color: #1e40af;
+  }
+
+  /* Forms */
+  form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #374151;
+  }
+  form input[type="text"],
+  form input[type="email"],
+  form select,
+  form textarea {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    border: 1.5px solid #9ca3af;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+  }
+  form input[type="text"]:focus,
+  form input[type="email"]:focus,
+  form select:focus,
+  form textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+  }
+  form textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  /* Responsive */
+  @media (max-width: 800px) {
+    body {
+      flex-direction: column;
+    }
+    #sidebar {
+      width: 100%;
+      display: flex;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+    #sidebar button {
+      flex: none;
+      border-left: none;
+      border-bottom: 3px solid transparent;
+      padding: 10px 16px;
+      font-size: 14px;
+    }
+    #sidebar button.active {
+      border-left: none;
+      border-bottom-color: white;
+      background-color: #3b82f6;
+      color: white;
+      font-weight: 700;
+    }
+    main {
+      padding: 20px;
+      height: calc(100vh - 60px);
+      overflow-y: auto;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h1>Teacher Dashboard</h1>
+  <nav>
+    <button class="active" data-view="overview">Overview</button>
+    <button data-view="students">Students</button>
+    <button data-view="createClass">Classes</button>
+    <button data-view="registerStudent">Register Student</button>
+    <button data-view="placementTest">Placement Test</button>
+    <button data-view="lessonPlans">Lesson Plans</button>
+    <button data-view="grammar">Grammar</button>
+    <button data-view="pronunciation">Pronunciation</button>
+    <button data-view="skills">Skills Info</button>
+    <button data-view="levels">Levels Info</button>
+    <button data-view="email">Send Email</button>
+  </nav>
+  <footer>Profile &copy; 2024</footer>
+</div>
+
+<main id="mainContent">
+  <!-- Conteúdo dinâmico será inserido aqui -->
+</main>
+
+<script>
+  (function(){
+    // Dados mock
+    const students = [
+      { id: 1, name: 'Alice Wonderland', email: 'alice@example.com', level: 'Intermediate', overallProgress: 75 },
+      { id: 2, name: 'Bob The Builder', email: 'bob@example.com', level: 'Beginner', overallProgress: 40 },
+      { id: 3, name: 'Charlie Chaplin', email: 'charlie@example.com', level: 'Advanced', overallProgress: 92 },
+      { id: 4, name: 'Diana Prince', email: 'diana@example.com', level: 'Intermediate', overallProgress: 60 },
+      { id: 5, name: 'Ethan Hunt', email: 'ethan@example.com', level: 'Not Placed', overallProgress: 0 }
+    ];
+
+    const classes = [
+      { id: 101, name: 'Morning Stars', level: 'Mixed', studentCount: 2 },
+      { id: 102, name: 'Afternoon Achievers', level: 'Beginner', studentCount: 2 },
+    ];
+
+    const lessons = [
+      { id: 1, title: 'Introduction to Past Simple', level: 'Beginner', topic: 'Grammar' },
+      { id: 2, title: 'Ordering Food', level: 'Intermediate', topic: 'Speaking' },
+      { id: 3, title: 'Understanding News Headlines', level: 'Advanced', topic: 'Reading' },
+    ];
+
+    // Elementos
+    const sidebarButtons = document.querySelectorAll('#sidebar nav button');
+    const main = document.getElementById('mainContent');
+
+    function clearActive() {
+      sidebarButtons.forEach(b => b.classList.remove('active'));
+    }
+
+    function setActiveButton(view) {
+      sidebarButtons.forEach(b => {
+        if (b.dataset.view === view) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+    }
+
+    // Função barra progresso HTML
+    function renderProgressBar(value) {
+      return `
+        <div style="display:flex; align-items:center;">
+          <div class="progress-bar" aria-label="Progress ${value}%">
+            <div class="progress-bar-fill" style="width:${value}%;"></div>
+          </div>
+          <div class="progress-text">${value}%</div>
+        </div>
+      `;
+    }
+
+    // Render main content by view
+    function renderView(view) {
+      setActiveButton(view);
+      switch(view) {
+        case 'overview':
+          const avgProgress = Math.round(students.reduce((acc, s) => acc + s.overallProgress, 0)/students.length);
+          return `
+            <h2>Dashboard Overview</h2>
+            <div class="card"><h3>Total Students</h3><p style="font-size:2rem; font-weight:700;">${students.length}</p></div>
+            <div class="card"><h3>Total Classes</h3><p style="font-size:2rem; font-weight:700;">${classes.length}</p></div>
+            <div class="card"><h3>Average Completion</h3><p style="font-size:2rem; font-weight:700;">${avgProgress}%</p>${renderProgressBar(avgProgress)}</div>
+          `;
+
+        case 'students':
+          return `
+            <h2>Manage Students</h2>
+            <table aria-label="Students table">
+              <thead>
+                <tr><th>Name</th><th>Email</th><th>Level</th><th>Progress</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                ${students.map(
+                  s => `
+                  <tr>
+                    <td>${s.name}</td>
+                    <td>${s.email}</td>
+                    <td>${s.level}</td>
+                    <td>${renderProgressBar(s.overallProgress)}</td>
+                    <td><button class="action-btn" data-action="view" data-id="${s.id}">View</button></td>
+                  </tr>
+                  `
+                ).join('')}
+              </tbody>
+            </table>
+          `;
+
+        case 'createClass':
+          return `
+            <h2>Create New Class</h2>
+            <form id="classForm" aria-label="Create class form">
+              <label for="className">Class Name</label>
+              <input type="text" id="className" name="className" required />
+              <label for="classLevel">Level</label>
+              <select id="classLevel" name="classLevel" required>
+                <option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Mixed</option>
+              </select>
+              <button type="submit" class="submit-btn">Create Class</button>
+            </form>
+            <h3>Existing Classes</h3>
+            <ul>
+              ${classes.map(c => `<li>${c.name} (${c.level}) - ${c.studentCount} students</li>`).join('')}
+            </ul>
+          `;
+
+        case 'registerStudent':
+          return `
+            <h2>Register New Student</h2>
+            <form id="studentForm" aria-label="Register student form">
+              <label for="studentName">Full Name</label>
+              <input type="text" id="studentName" name="studentName" required />
+              <label for="studentEmail">Email</label>
+              <input type="email" id="studentEmail" name="studentEmail" required />
+              <button type="submit" class="submit-btn">Register Student</button>
+            </form>
+          `;
+
+        case 'placementTest':
+          return `
+            <h2>Placement Test</h2>
+            <p>This feature will be implemented soon.</p>
+          `;
+
+        case 'lessonPlans':
+          return `
+            <h2>Lesson Plans</h2>
+            <ul>
+              ${lessons.map(l => `<li><b>${l.title}</b> (Level: ${l.level}, Topic: ${l.topic})</li>`).join('')}
+            </ul>
+          `;
+
+        case 'grammar':
+          return `
+            <h2>Grammar Resources</h2>
+            <p>Coming soon...</p>
+          `;
+
+        case 'pronunciation':
+          return `
+            <h2>Pronunciation Resources</h2>
+            <p>Coming soon...</p>
+          `;
+
+        case 'skills':
+          return `
+            <h2>Skills Info</h2>
+            <p>Coming soon...</p>
+          `;
+
+        case 'levels':
+          return `
+            <h2>Levels Info</h2>
+            <p>Coming soon...</p>
+          `;
+
+        case 'email':
+          return `
+            <h2>Send Email</h2>
+            <form id="emailForm" aria-label="Send email form">
+              <label for="emailTo">To (email or group)</label>
+              <input type="text" id="emailTo" name="emailTo" required />
+              <label for="emailSubject">Subject</label>
+              <input type="text" id="emailSubject" name="emailSubject" required />
+              <label for="emailBody">Message</label>
+              <textarea id="emailBody" name="emailBody" rows="5" required></textarea>
+              <button type="submit" class="submit-btn">Send Email</button>
+            </form>
+          `;
+
+        default:
+          return `<p>View not found.</p>`;
+      }
+    }
+
+    // Render content function
+    function renderContent(view) {
+      main.innerHTML = renderView(view);
+      attachActions(view);
+    }
+
+    // Handle actions like form submits and button clicks inside main
+    function attachActions(view) {
+      if(view === 'students') {
+        document.querySelectorAll('button[data-action="view"]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const studentId = btn.dataset.id;
+            const student = students.find(s => s.id === +studentId);
+            alert(`Student Detail:\nName: ${student.name}\nEmail: ${student.email}\nLevel: ${student.level}\nProgress: ${student.overallProgress}%`);
+          });
+        });
+      }
+
+      if(view === 'createClass') {
+        const form = document.getElementById('classForm');
+        form.addEventListener('submit', e => {
+          e.preventDefault();
+          const cname = form.className.value.trim();
+          const clevel = form.classLevel.value;
+          if(cname === '') {
+            alert('Please enter a class name.');
+            return;
+          }
+          alert(`Class created!\nName: ${cname}\nLevel: ${clevel}`);
+          form.reset();
+        });
+      }
+
+      if(view === 'registerStudent') {
+        const form = document.getElementById('studentForm');
+        form.addEventListener('submit', e => {
+          e.preventDefault();
+          const sname = form.studentName.value.trim();
+          const semail = form.studentEmail.value.trim();
+          if(sname === '' || semail === '') {
+            alert('Please fill all fields.');
+            return;
+          }
+          alert(`Student registered!\nName: ${sname}\nEmail: ${semail}`);
+          form.reset();
+        });
+      }
+
+      if(view === 'email') {
+        const form = document.getElementById('emailForm');
+        form.addEventListener('submit', e => {
+          e.preventDefault();
+          const to = form.emailTo.value.trim();
+          const subject = form.emailSubject.value.trim();
+          const body = form.emailBody.value.trim();
+          if(!to || !subject || !body){
+            alert('Please fill all email fields.');
+            return;
+          }
+          alert(`Email sent to: ${to}\nSubject: ${subject}`);
+          form.reset();
+        });
+      }
+    }
+
+    // Initialize nav buttons
+    sidebarButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        renderContent(view);
+        setActiveButton(view);
+      });
+    });
+
+    // Initial render
+    renderContent('overview');
+
+  })();
+</script>
+
+</body>
+</html>
