@@ -140,3 +140,28 @@
 </script>
 </body>
 </html>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+  const supabase = createClient('https://bjlhrjybswosgykeuofp.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...');
+
+  async function signInWithGitHub() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+    });
+    if (error) {
+      console.error('Erro ao fazer login:', error.message);
+    }
+  }
+
+  async function signOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Erro ao fazer logout:', error.message);
+    }
+  }
+
+  // Exemplo de como chamar as funções
+  document.getElementById('loginBtn').addEventListener('click', signInWithGitHub);
+  document.getElementById('logoutBtn').addEventListener('click', signOut);
+</script>
