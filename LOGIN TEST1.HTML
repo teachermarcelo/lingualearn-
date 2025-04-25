@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login com Supabase</title>
+</head>
+<body>
+  <h1>Login com Supabase (GitHub)</h1>
+
+  <button id="loginBtn">Entrar com GitHub</button>
+  <button id="logoutBtn">Sair</button>
+  <p id="status"></p>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+
+    // 🔑 Suas credenciais
+    const SUPABASE_URL = 'https://bjlhrjybswosgykeuofp.supabase.co'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqbGhyanlic3dvc2d5a2V1b2ZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU2MDU0MjQsImV4cCI6MjA2MTE4MTQyNH0.CQ1euQR8oBjZ2f_FK_nJZ-JV_xEo5LLyV-L_2mLrjyI'
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+    // Verificar usuário logado
+    async function checkUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+      const status = document.getElementById('status')
+      if (user) {
+        status.textContent = `✅ Logado como: ${user.email || 'GitHub'}`
+      } else {
+        status.textContent = '🔒 Você não está logado.'
+      }
+    }
+
+    // Login com GitHub
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+      })
+      if (error) {
+        alert('Erro no login: ' + error.message)
+      }
+    })
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabase.auth.signOut()
+      checkUser()
+    })
+
+    // Verificar ao carregar
+    checkUser()
+  </script>
+</body>
+</html>
