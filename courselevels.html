@@ -3,19 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dashboard CEFR Levels A1 até C2</title>
+<title>Dashboard Courses / Levels CEFR - Modern</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 <style>
+  /* Reset */
   * {
     box-sizing: border-box;
   }
   body, html {
-    margin:0; padding:0; height:100vh; font-family: 'Inter', sans-serif;
-    background:#f9fafb;
-    color:#111827;
-    display:flex;
-    overflow:hidden;
+    margin: 0; padding: 0; height: 100vh; font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+    color: #1f2937;
+    display: flex;
+    overflow: hidden;
   }
+
+  /* Sidebar */
   #sidebar {
     width: 280px;
     background: #1e40af;
@@ -36,6 +39,7 @@
   nav {
     flex-grow: 1;
     overflow-y: auto;
+    padding-bottom: 2rem;
   }
   nav button {
     width: 100%;
@@ -83,19 +87,21 @@
   }
   #sidebar footer {
     padding: 1.5rem 2rem;
-    font-size: 14px;
+    font-size: 0.9rem;
     text-align: center;
     color: #93c5fd;
     border-top: 1.5px solid rgba(147,197,253,0.4);
     user-select: none;
   }
 
+  /* Main content */
   main {
     flex-grow: 1;
     overflow-y: auto;
     padding: 40px 48px;
-    background: #fff;
+    background: #ffffff;
   }
+
   main h2 {
     font-size: 2.4rem;
     font-weight: 700;
@@ -110,7 +116,21 @@
     font-size: 1.125rem;
     color: #475569;
   }
-  @media (max-width: 768px) {
+
+  /* Scrollbar for sidebar */
+  nav::-webkit-scrollbar {
+    width: 6px;
+  }
+  nav::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  nav::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 3px;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
     #sidebar {
       width: 100%;
       height: 56px;
@@ -151,60 +171,69 @@
     }
     main {
       padding: 20px 24px;
-      height: calc(100vh - 56px);
-      overflow-y: auto;
-      box-shadow: none;
     }
   }
+
 </style>
 </head>
 <body>
 
 <div id="sidebar">
-<a href="index.html" class="font-medium">
-  <h1 class="text-white hover:text-white">CEFR LEVELS</h1>
-</a>
-
+  <h1>COURSE / LEVELS</h1>
   <nav id="navButtons" aria-label="Menu principal">
     <button class="active" data-view="A1" aria-current="page" title="Nível A1">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10.0114 10.0114 0 0 0 12 2zM7 17v-2h6v2zM17 13a5 5 0 1 1-5-5 5 5 0 0 1 5 5z"/></svg>
-      A1 – Beginner
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2a10 10 0 1 0 10 10A10.0114 10.0114 0 0 0 12 2zM7 17v-2h6v2zM17 13a5 5 0 1 1-5-5 5 5 0 0 1 5 5z"/>
+      </svg>
+      A1 - Beginner
     </button>
     <button data-view="A2" title="Nível A2">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21h16v-2H4zm2-4h12v-2H6zm2-4h8v-2H8zm2-4h4V7h-4z"/></svg>
-      A2 – Elementary
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 21h16v-2H4zm2-4h12v-2H6zm2-4h8v-2H8zm2-4h4V7h-4z"/>
+      </svg>
+      A2 - Elementary
     </button>
     <button data-view="B1" title="Nível B1">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10zm0-18C7.589 4 4 7.589 4 12s3.589 8 8 8 8-3.589 8-8-3.589-8-8-8z"/></svg>
-      B1 – Intermediate
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10zm0-18C7.589 4 4 7.589 4 12s3.589 8 8 8 8-3.589 8-8-3.589-8-8-8z"/>
+      </svg>
+      B1 - Intermediate
     </button>
     <button data-view="B2" title="Nível B2">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h18v18H3zm5 14h10v-2H8zm2-4h8v-2h-8zm2-4h6V7h-6z"/></svg>
-      B2 – Upper-Intermediate
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 3h18v18H3zm5 14h10v-2H8zm2-4h8v-2h-8zm2-4h6V7h-6z"/>
+      </svg>
+      B2 - Upper-Intermediate
     </button>
     <button data-view="C1" title="Nível C1">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l1.41 2.83 3.17.46-2.29 2.23.54 3.14-2.83-1.49L7.59 12l.54-3.14-2.29-2.23 3.17-.46z"/></svg>
-      C1 – Advanced
-    </button>
-    <button data-view="C2" title="Nível C2">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20a8 8 0 1 0-8-8v2a6 6 0 1 1 6 6z"/></svg>
-      C2 – Mastery
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 4l1.41 2.83 3.17.46-2.29 2.23.54 3.14-2.83-1.49L7.59 12l.54-3.14-2.29-2.23 3.17-.46z"/>
+      </svg>
+      C1 - Advanced
     </button>
     <hr style="border-color: rgba(255 255 255 / 0.15); margin: 1.8rem 0;">
     <button data-view="business" title="Business English">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v2H7zm0 4h7v2H7zm0 4h7v2H7zm0 4h10v2H7z"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 4h10v2H7zm0 4h7v2H7zm0 4h7v2H7zm0 4h10v2H7z"/>
+      </svg>
       Business
     </button>
     <button data-view="diasComemorativos" title="Dias Comemorativos">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7a5 5 0 1 0 5 5 5.0059 5.0059 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3.0033 3.0033 0 0 1-3 3zm-7-8H5v10h14V7h1v12H4V7z"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 7a5 5 0 1 0 5 5 5.0059 5.0059 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3.0033 3.0033 0 0 1-3 3zm-7-8H5v10h14V7h1v12H4V7z"/>
+      </svg>
       Dias Comemorativos
     </button>
-    <button data-view="recordVoice" title="Record Voice">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3zM5 17h14v-2h-1v-1a6 6 0 0 1-12 0v1H5zm7 3a7 7 0 0 0 7-7h-2a5 5 0 0 1-10 0H5a7 7 0 0 0 7 7z"/></svg>
+    <button data-view="recordVoice" title="Gravar voz">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3zM5 17h14v-2h-1v-1a6 6 0 0 1-12 0v1H5zm7 3a7 7 0 0 0 7-7h-2a5 5 0 0 1-10 0H5a7 7 0 0 0 7 7z"/>
+      </svg>
       Record Voice
     </button>
-    <button data-view="recognizeVoice" title="Recognize Voice Pronunciation">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zm3 9a3 3 0 0 1-6 0V7a3 3 0 0 1 6 0zM7 17h10v2H7z"/></svg>
+    <button data-view="recognizeVoice" title="Reconhecimento de voz">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zm3 9a3 3 0 0 1-6 0V7a3 3 0 0 1 6 0zM7 17h10v2H7z"/>
+      </svg>
       Recognize Voice
     </button>
   </nav>
@@ -237,10 +266,6 @@
         title: 'Nível C1 – Advanced',
         text: `No nível C1, o usuário compreende uma vasta gama de textos extensos e complexos, reconhecendo significados implícitos. Expressa-se fluentemente e de forma espontânea sem muita dificuldade para encontrar as palavras. Usa a língua efetivamente para fins sociais, acadêmicos e profissionais. Produz textos claros, bem estruturados e detalhados sobre assuntos complexos.`
       },
-      'C2': {
-        title: 'Nível C2 – Mastery',
-        text: `No nível C2, o usuário domina praticamente todas as formas da língua com alta precisão, fluência e naturalidade. Consegue compreender praticamente tudo que escuta ou lê, resumir informações de diversas fontes, e expressar-se espontaneamente de forma muito clara e diferenciada para fins acadêmicos, profissionais e sociais avançados.`
-      },
       'business': {
         title: 'Business English',
         text: `Material e conteúdos focados no inglês para negócios, comunicação corporativa, apresentações, reuniões, negociações e vocabulário especializado que permite atuar com fluência no mercado profissional global.`
@@ -264,11 +289,10 @@
 
     function setActiveButton(view) {
       sidebarButtons.forEach(b => {
+        b.classList.toggle('active', b.dataset.view === view);
         if(b.dataset.view === view){
-          b.classList.add('active');
           b.setAttribute('aria-current', 'page');
         } else {
-          b.classList.remove('active');
           b.removeAttribute('aria-current');
         }
       });
@@ -278,7 +302,7 @@
       if(contentByView.hasOwnProperty(view)) {
         const {title, text} = contentByView[view];
         main.innerHTML = `<h2>${title}</h2><p>${text}</p>`;
-        main.focus();
+        main.focus(); // para acessibilidade, informar leitores de tela
       } else {
         main.innerHTML = `<h2>Opção não disponível</h2><p>Conteúdo ainda não cadastrado para essa opção.</p>`;
       }
@@ -292,9 +316,10 @@
       });
     });
 
-    // Inicial renderização
-    setActiveButton('A1');
-    renderView('A1');
+    // Inicial render
+    const initialView = 'A1';
+    setActiveButton(initialView);
+    renderView(initialView);
 
   })();
 </script>
