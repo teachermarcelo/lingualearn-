@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard CEFR Levels A1 até C2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin:0; padding:0; height:100vh; font-family: 'Inter', sans-serif;
+    background:#f9fafb;
+    color:#111827;
+    display:flex;
+    overflow:hidden;
+  }
+  #sidebar {
+    width: 280px;
+    background: #1e40af;
+    color: white;
+    padding-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    border-right: 1.5px solid #3b82f6;
+  }
+  #sidebar h1 {
+    margin-left: 2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: 1.1px;
+    user-select: none;
+  }
+  nav {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+  nav button {
+    width: 100%;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: #bfdbfe;
+    font-weight: 500;
+    font-size: 1.1rem;
+    text-align: left;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-left: 4px solid transparent;
+    white-space: nowrap;
+    user-select: none;
+  }
+  nav button svg {
+    width: 20px;
+    height: 20px;
+    fill: #bfdbfe;
+    flex-shrink: 0;
+    transition: fill 0.3s ease;
+  }
+  nav button:hover,
+  nav button:focus {
+    background-color: #2563eb;
+    color: #e0e7ff;
+  }
+  nav button.active {
+    color: #1e40af;
+    background-color: #e0e7ff;
+    font-weight: 700;
+    border-left: 4px solid #2563eb;
+  }
+  nav button.active svg {
+    fill: #2563eb;
+  }
+  nav hr {
+    border-color: rgba(255 255 255 / 0.15);
+    margin: 1rem 2rem;
+  }
+  #sidebar footer {
+    padding: 1.5rem 2rem;
+    font-size: 14px;
+    text-align: center;
+    color: #93c5fd;
+    border-top: 1.5px solid rgba(147,197,253,0.4);
+    user-select: none;
+  }
+
+  main {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 40px 48px;
+    background: #fff;
+  }
+  main h2 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 28px;
+    user-select: none;
+  }
+  main p {
+    max-width: 720px;
+    line-height: 1.65;
+    font-weight: 400;
+    font-size: 1.125rem;
+    color: #475569;
+  }
+  @media (max-width: 768px) {
+    #sidebar {
+      width: 100%;
+      height: 56px;
+      flex-direction: row;
+      border-right: none;
+      border-bottom: 1.5px solid #3b82f6;
+      padding: 0;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #3b82f6 transparent;
+    }
+    #sidebar h1 {
+      display: none;
+    }
+    nav {
+      flex-direction: row;
+      display: flex;
+      padding: 0;
+      flex-grow: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    nav button {
+      padding: 0 16px;
+      font-size: 1rem;
+      border-left: none !important;
+      border-right: 4px solid transparent;
+      border-radius: 0 !important;
+      justify-content: center;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    nav button.active {
+      border-right-color: #2563eb;
+      background-color: #e0e7ff;
+      color: #2563eb;
+      font-weight: 700;
+    }
+    main {
+      padding: 20px 24px;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      box-shadow: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h1>CEFR LEVELS</h1>
+  <nav id="navButtons" aria-label="Menu principal">
+    <button class="active" data-view="A1" aria-current="page" title="Nível A1">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10.0114 10.0114 0 0 0 12 2zM7 17v-2h6v2zM17 13a5 5 0 1 1-5-5 5 5 0 0 1 5 5z"/></svg>
+      A1 – Beginner
+    </button>
+    <button data-view="A2" title="Nível A2">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21h16v-2H4zm2-4h12v-2H6zm2-4h8v-2H8zm2-4h4V7h-4z"/></svg>
+      A2 – Elementary
+    </button>
+    <button data-view="B1" title="Nível B1">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10zm0-18C7.589 4 4 7.589 4 12s3.589 8 8 8 8-3.589 8-8-3.589-8-8-8z"/></svg>
+      B1 – Intermediate
+    </button>
+    <button data-view="B2" title="Nível B2">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h18v18H3zm5 14h10v-2H8zm2-4h8v-2h-8zm2-4h6V7h-6z"/></svg>
+      B2 – Upper-Intermediate
+    </button>
+    <button data-view="C1" title="Nível C1">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l1.41 2.83 3.17.46-2.29 2.23.54 3.14-2.83-1.49L7.59 12l.54-3.14-2.29-2.23 3.17-.46z"/></svg>
+      C1 – Advanced
+    </button>
+    <button data-view="C2" title="Nível C2">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20a8 8 0 1 0-8-8v2a6 6 0 1 1 6 6z"/></svg>
+      C2 – Mastery
+    </button>
+    <hr style="border-color: rgba(255 255 255 / 0.15); margin: 1.8rem 0;">
+    <button data-view="business" title="Business English">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v2H7zm0 4h7v2H7zm0 4h7v2H7zm0 4h10v2H7z"/></svg>
+      Business
+    </button>
+    <button data-view="diasComemorativos" title="Dias Comemorativos">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7a5 5 0 1 0 5 5 5.0059 5.0059 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3.0033 3.0033 0 0 1-3 3zm-7-8H5v10h14V7h1v12H4V7z"/></svg>
+      Dias Comemorativos
+    </button>
+    <button data-view="recordVoice" title="Record Voice">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3zM5 17h14v-2h-1v-1a6 6 0 0 1-12 0v1H5zm7 3a7 7 0 0 0 7-7h-2a5 5 0 0 1-10 0H5a7 7 0 0 0 7 7z"/></svg>
+      Record Voice
+    </button>
+    <button data-view="recognizeVoice" title="Recognize Voice Pronunciation">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5zm3 9a3 3 0 0 1-6 0V7a3 3 0 0 1 6 0zM7 17h10v2H7z"/></svg>
+      Recognize Voice
+    </button>
+  </nav>
+  <footer>© 2024 Language Institute</footer>
+</div>
+
+<main id="mainContent" tabindex="0" aria-live="polite" aria-atomic="true">
+</main>
+
+<script>
+  (function(){
+    const contentByView = {
+      'A1': {
+        title: 'Nível A1 – Beginner',
+        text: `O nível A1 é o nível inicial de proficiência em língua inglesa, segundo o CEFR. Nesse nível, o aluno consegue compreender e usar expressões familiares do dia a dia e frases básicas para satisfazer necessidades concretas. É capaz de se apresentar, pedir informações simples e interagir de maneira simples, se o interlocutor falar devagar e com clareza.`
+      },
+      'A2': {
+        title: 'Nível A2 – Elementary',
+        text: `No nível A2, o estudante pode entender frases isoladas e expressões frequentes relacionadas a áreas de relevância imediata, como informações pessoais, familiares, compras, trabalho e geografia local. Já consegue se comunicar em tarefas simples e rotineiras que exijam trocas simples e diretas de informações.`
+      },
+      'B1': {
+        title: 'Nível B1 – Intermediate',
+        text: `No nível B1, o usuário é capaz de compreender os pontos principais em situações claras no trabalho, escola, lazer, etc. Pode lidar com a maioria das situações que possam surgir durante viagens em regiões onde o idioma é falado. Já pode produzir textos simples sobre temas conhecidos e descrever experiências, eventos, desejos e ambições.`
+      },
+      'B2': {
+        title: 'Nível B2 – Upper-Intermediate',
+        text: `No nível B2, o falante compreende as ideias principais de textos complexos, incluindo discussões técnicas em seu campo de especialização. Interage com falantes nativos de forma natural e fluente sem grande esforço para qualquer das partes. Pode produzir textos claros e detalhados sobre vários assuntos, explicando um ponto de vista.`
+      },
+      'C1': {
+        title: 'Nível C1 – Advanced',
+        text: `No nível C1, o usuário compreende uma vasta gama de textos extensos e complexos, reconhecendo significados implícitos. Expressa-se fluentemente e de forma espontânea sem muita dificuldade para encontrar as palavras. Usa a língua efetivamente para fins sociais, acadêmicos e profissionais. Produz textos claros, bem estruturados e detalhados sobre assuntos complexos.`
+      },
+      'C2': {
+        title: 'Nível C2 – Mastery',
+        text: `No nível C2, o usuário domina praticamente todas as formas da língua com alta precisão, fluência e naturalidade. Consegue compreender praticamente tudo que escuta ou lê, resumir informações de diversas fontes, e expressar-se espontaneamente de forma muito clara e diferenciada para fins acadêmicos, profissionais e sociais avançados.`
+      },
+      'business': {
+        title: 'Business English',
+        text: `Material e conteúdos focados no inglês para negócios, comunicação corporativa, apresentações, reuniões, negociações e vocabulário especializado que permite atuar com fluência no mercado profissional global.`
+      },
+      'diasComemorativos': {
+        title: 'Dias Comemorativos',
+        text: `Conteúdos, vocabulário e atividades relacionados a feriados e datas comemorativas importantes ao redor do mundo, possibilitando aprender o idioma no contexto cultural. Ex: Natal, Páscoa, Dia das Mães, Halloween, etc.`
+      },
+      'recordVoice': {
+        title: 'Record Voice (Gravar Voz)',
+        text: `Funcionalidade para gravação de voz para praticar pronúncia, falar textos e ouvir sua própria fala como forma de autocrítica e melhora do inglês falado.`
+      },
+      'recognizeVoice': {
+        title: 'Recognize Voice Pronunciation (Reconhecimento de Voz)',
+        text: `Ferramenta para reconhecimento automático da fala, auxiliando o aluno a verificar se sua pronúncia está correta com feedback imediato através da comparação com a pronúncia padrão.`
+      }
+    };
+
+    const sidebarButtons = document.querySelectorAll('#sidebar nav button');
+    const main = document.getElementById('mainContent');
+
+    function setActiveButton(view) {
+      sidebarButtons.forEach(b => {
+        if(b.dataset.view === view){
+          b.classList.add('active');
+          b.setAttribute('aria-current', 'page');
+        } else {
+          b.classList.remove('active');
+          b.removeAttribute('aria-current');
+        }
+      });
+    }
+
+    function renderView(view) {
+      if(contentByView.hasOwnProperty(view)) {
+        const {title, text} = contentByView[view];
+        main.innerHTML = `<h2>${title}</h2><p>${text}</p>`;
+        main.focus();
+      } else {
+        main.innerHTML = `<h2>Opção não disponível</h2><p>Conteúdo ainda não cadastrado para essa opção.</p>`;
+      }
+    }
+
+    sidebarButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        setActiveButton(view);
+        renderView(view);
+      });
+    });
+
+    // Inicial renderização
+    setActiveButton('A1');
+    renderView('A1');
+
+  })();
+</script>
+
+</body>
+</html>
